@@ -1,0 +1,22 @@
+{
+  "runtime": "TensorFlowLiteC",
+  "version": "2.17.0",
+  "source": "https://dl.google.com/tflite-release/ios/prod/tensorflow/lite/release/ios/release/32/20240729-115310/TensorFlowLiteC/2.17.0/0c10b3543e01f547/TensorFlowLiteC-2.17.0.tar.gz",
+  "archiveSHA256": "9667b476015f136e5b332ce040e12822c4ac6d5c58947882ddc809cdff0fb99e",
+  "podspec": "https://raw.githubusercontent.com/CocoaPods/Specs/master/Specs/1/6/0/TensorFlowLiteC/2.17.0/TensorFlowLiteC.podspec.json",
+  "sourceCode": "https://github.com/tensorflow/tensorflow/tree/v2.17.0/tensorflow/lite",
+  "license": "Apache-2.0; TensorFlow third-party components retain their respective licenses",
+  "included": "Core TensorFlowLiteC.xcframework only. CoreML and Metal delegate frameworks excluded.",
+  "privacyManifest": "The upstream PrivacyInfo.xcprivacy is retained in the XCFramework and copied as a Swift package resource.",
+  "upstreamXCFrameworkBytes": 77361843,
+  "xcframeworkBytes": 77363400,
+  "localPackagingChanges": "Added Info.plist to each framework slice for Xcode Swift Package embedding validation. The upstream binaries are static relocatable Mach-O objects, not dynamic runtimes; their bytes and SHA-256 remain unchanged. Xcode may produce a small resource framework stub when embedding PrivacyInfo.xcprivacy.",
+  "addedFiles": [
+    {"path": "TensorFlowLiteC.xcframework/ios-arm64/TensorFlowLiteC.framework/Info.plist", "bytes": 775, "sha256": "fb855b9323f1c3e0be22d3206372dfb25eeb190f2b0ddf2094d4b6cc70fae117"},
+    {"path": "TensorFlowLiteC.xcframework/ios-arm64_x86_64-simulator/TensorFlowLiteC.framework/Info.plist", "bytes": 782, "sha256": "d194c24c0d228af9ed7a298205cf682a9e531944bff6915df582bb8b61fdbdc4"}
+  ],
+  "binaries": [
+    {"path": "TensorFlowLiteC.xcframework/ios-arm64/TensorFlowLiteC.framework/TensorFlowLiteC", "bytes": 23420023, "sha256": "0af9943357e8b94e16b28f807d9acf44f596954191e34b4f5dd46d0c49b29561"},
+    {"path": "TensorFlowLiteC.xcframework/ios-arm64_x86_64-simulator/TensorFlowLiteC.framework/TensorFlowLiteC", "bytes": 53519179, "sha256": "26a2e0179f2899e2652a76890b98b56647462add7b4d70c9bb8124dc98e66def"}
+  ]
+}

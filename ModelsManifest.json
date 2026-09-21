@@ -1,0 +1,94 @@
+[
+  {
+    "id": "zipformer",
+    "revision": "c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95",
+    "frameworkVersion": "sherpa-onnx 1.13.8 / ONNX Runtime 1.28.2 · CPU",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15",
+    "license": "Apache-2.0（固定转换模型卡声明）。",
+    "modelFile": "model.int8.onnx",
+    "labelsFile": "class_labels_indices.csv",
+    "files": [
+      {
+        "path": "model.int8.onnx",
+        "bytes": 27038066,
+        "sha256": "69304b8a1b96bbe6b7d16c24079f0732c65faf3568a14cb82a8238c709afe76c",
+        "source": "https://huggingface.co/k2-fsa/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15/resolve/c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95/model.int8.onnx"
+      },
+      {
+        "path": "class_labels_indices.csv",
+        "bytes": 14675,
+        "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429",
+        "source": "https://huggingface.co/k2-fsa/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15/resolve/c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95/class_labels_indices.csv"
+      }
+    ]
+  },
+  {
+    "id": "cedTiny",
+    "revision": "efe3a5cfad74e56598d855d055006903adc00e38",
+    "frameworkVersion": "sherpa-onnx 1.13.8 / ONNX Runtime 1.28.2 · CPU",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-tiny-audio-tagging-2024-04-19",
+    "license": "Apache-2.0；k2转换模型卡未另列许可，原作者权重许可依据见Docs。",
+    "modelFile": "model.int8.onnx",
+    "labelsFile": "class_labels_indices.csv",
+    "files": [
+      {
+        "path": "model.int8.onnx",
+        "bytes": 6133417,
+        "sha256": "73aa22e783115f6a4ae169b36089907e07d0fd44795595eddea9c1bfc74cc945",
+        "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-tiny-audio-tagging-2024-04-19/resolve/efe3a5cfad74e56598d855d055006903adc00e38/model.int8.onnx"
+      },
+      {
+        "path": "class_labels_indices.csv",
+        "bytes": 14675,
+        "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429",
+        "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-tiny-audio-tagging-2024-04-19/resolve/efe3a5cfad74e56598d855d055006903adc00e38/class_labels_indices.csv"
+      }
+    ]
+  },
+  {
+    "id": "cedMini",
+    "revision": "4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d",
+    "frameworkVersion": "sherpa-onnx 1.13.8 / ONNX Runtime 1.28.2 · CPU",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-mini-audio-tagging-2024-04-19",
+    "license": "Apache-2.0；k2转换模型卡未另列许可，原作者权重许可依据见Docs。",
+    "modelFile": "model.int8.onnx",
+    "labelsFile": "class_labels_indices.csv",
+    "files": [
+      {
+        "path": "model.int8.onnx",
+        "bytes": 10451715,
+        "sha256": "ff29f39f9fbe637f72535160e9d006d61d872fdab0fce838672265b9b38cf946",
+        "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-mini-audio-tagging-2024-04-19/resolve/4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d/model.int8.onnx"
+      },
+      {
+        "path": "class_labels_indices.csv",
+        "bytes": 14675,
+        "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429",
+        "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-mini-audio-tagging-2024-04-19/resolve/4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d/class_labels_indices.csv"
+      }
+    ]
+  },
+  {
+    "id": "yamnet",
+    "revision": "MediaPipe audio_classifier/yamnet/float32/1",
+    "frameworkVersion": "TensorFlow Lite C 2.17.0 · CPU",
+    "source": "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite",
+    "license": "Apache-2.0",
+    "modelFile": "yamnet.tflite",
+    "labelsFile": "yamnet_label_list.txt",
+    "files": [
+      {
+        "path": "yamnet.tflite",
+        "bytes": 4126810,
+        "sha256": "4d8b4a53282dc83ef04e3e7dbc4fbc98082e34e44ed798e16c3a0cdd4c584faf",
+        "source": "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite"
+      },
+      {
+        "path": "yamnet_label_list.txt",
+        "bytes": 6230,
+        "sha256": "8e1267a120c1932b7273c0d0e0c5529edbb9a35512b437b1c8982baa59047051",
+        "source": "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite#associated-yamnet_label_list.txt"
+      }
+    ]
+  }
+]

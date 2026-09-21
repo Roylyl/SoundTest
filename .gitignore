@@ -1,0 +1,63 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Xcode and Swift build products
+Build/
+build/
+DerivedData/
+SourcePackages/
+.build/
+.swiftpm/
+*.app
+*.ipa
+*.xcarchive
+*.dSYM/
+*.dSYM.zip
+*.hmap
+*.xcresult/
+*.profdata
+.coverage
+
+# Local configuration, signing material and secrets
+Config/Local.xcconfig
+.env
+.env.*
+!.env.example
+*.mobileprovision
+*.p12
+*.cer
+*.key
+*.pem
+
+# Generated logs, previews and test evidence
+*.log
+Preview/
+Tests/Artifacts/
+Docs/Archive/
+
+# Temporary editor and tooling files
+*.tmp
+*.swp
+*.swo
+*~
+
+# Intentionally tracked: ModelLibrary/, Packages/ binaries, license files,
+# ModelsManifest.json and Tests/Unit/Fixtures/. Large binaries use Git LFS.

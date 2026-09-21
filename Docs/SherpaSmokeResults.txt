@@ -1,0 +1,19 @@
+sherpa 1.13.8; ONNX Runtime 1.28.2
+zipformer | synthetic silence | 1.000 s | 527 scores | 15.118 ms | top5: Silence=0.973974; Music=0.051314; Sound effect=0.032868; Vehicle=0.021568; Speech=0.018169;
+zipformer | synthetic silence | 2.000 s | 527 scores | 23.995 ms | top5: Silence=0.894702; Music=0.311827; Vehicle=0.025164; Speech=0.021720; Outside, rural or natural=0.016817;
+zipformer | synthetic silence | 5.000 s | 527 scores | 50.703 ms | top5: Silence=0.952186; Music=0.065680; Speech=0.026221; Vehicle=0.016702; Outside, rural or natural=0.003842;
+zipformer | synthetic silence | 10.000 s | 527 scores | 97.798 ms | top5: Music=0.365646; Silence=0.273617; Speech=0.065531; Vehicle=0.012148; Inside, small room=0.009821;
+zipformer | synthetic silence | 30.000 s | 527 scores | 352.452 ms | top5: Music=0.385301; Silence=0.253771; Speech=0.091863; Vehicle=0.019021; Inside, small room=0.008093;
+zipformer | upstream test_wavs/12.wav | 8.975 s | 527 scores | 86.483 ms | top5: Animal=0.680814; Dog=0.620502; Bark=0.603950; Bow-wow=0.511375; Domestic animals, pets=0.479949;
+cedTiny | synthetic silence | 1.000 s | 527 scores | 2.942 ms | top5: Silence=0.684216; Music=0.129887; Sound effect=0.037975; Sine wave=0.023286; Musical instrument=0.016810;
+cedTiny | synthetic silence | 2.000 s | 527 scores | 4.058 ms | top5: Silence=0.675813; Music=0.129485; Sound effect=0.041011; Sine wave=0.021716; Musical instrument=0.016654;
+cedTiny | synthetic silence | 5.000 s | 527 scores | 10.341 ms | top5: Silence=0.658305; Music=0.130247; Sound effect=0.038721; Sine wave=0.022236; Musical instrument=0.015953;
+cedTiny | synthetic silence | 10.000 s | 527 scores | 21.583 ms | top5: Silence=0.662085; Music=0.121810; Sound effect=0.037703; Sine wave=0.020991; Musical instrument=0.014022;
+cedTiny | synthetic silence | 30.000 s | 527 scores | 84.586 ms | top5: Silence=0.638531; Music=0.124571; Sound effect=0.040119; Sine wave=0.017335; Speech=0.014069;
+cedTiny | upstream test_wavs/12.wav | 8.975 s | 527 scores | 18.651 ms | top5: Animal=0.580728; Bark=0.511369; Dog=0.495783; Domestic animals, pets=0.450772; Bow-wow=0.214002;
+cedMini | synthetic silence | 1.000 s | 527 scores | 3.300 ms | top5: Silence=0.489675; Music=0.167987; Sound effect=0.036816; Sine wave=0.030425; Speech=0.016892;
+cedMini | synthetic silence | 2.000 s | 527 scores | 5.363 ms | top5: Silence=0.507580; Music=0.170020; Sound effect=0.035685; Sine wave=0.029069; Speech=0.017728;
+cedMini | synthetic silence | 5.000 s | 527 scores | 12.637 ms | top5: Silence=0.510260; Music=0.170200; Sound effect=0.035356; Sine wave=0.026589; Speech=0.017817;
+cedMini | synthetic silence | 10.000 s | 527 scores | 26.791 ms | top5: Silence=0.530651; Music=0.174641; Sound effect=0.034966; Sine wave=0.025823; Speech=0.018299;
+cedMini | synthetic silence | 30.000 s | 527 scores | 108.667 ms | top5: Silence=0.479754; Music=0.164042; Sound effect=0.033485; Sine wave=0.025847; Speech=0.018818;
+cedMini | upstream test_wavs/12.wav | 8.975 s | 527 scores | 24.247 ms | top5: Animal=0.699605; Dog=0.638081; Bark=0.587781; Domestic animals, pets=0.565345; Bow-wow=0.254386;

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-21",
+  "dataset": "AudioSet temporally-strong labels",
+  "release": "May 2021",
+  "officialDescription": "https://research.google.com/audioset/download_strong.html",
+  "method": "Read the official TSV objects at pinned Google Cloud Storage generations. Resolve each target by MID, count matching rows as annotation events and distinct clip_id values as excerpts. No audio was downloaded or used for these counts.",
+  "metadataResources": [
+    {
+      "role": "strong-label vocabulary",
+      "filename": "mid_to_display_name.tsv",
+      "url": "https://storage.googleapis.com/us_audioset/youtube_corpus/strong/mid_to_display_name.tsv?generation=1620508284883494",
+      "generation": "1620508284883494",
+      "lastModified": "2021-05-08T21:11:24Z",
+      "bytes": 10477,
+      "sha256": "6aeaa2144223933eab75566ca478366ad80e59f381611e308cbe536913d7ddf7"
+    },
+    {
+      "role": "continuous-time strong evaluation annotations",
+      "filename": "audioset_eval_strong.tsv",
+      "url": "https://storage.googleapis.com/us_audioset/youtube_corpus/strong/audioset_eval_strong.tsv?generation=1620508287503257",
+      "generation": "1620508287503257",
+      "lastModified": "2021-05-08T21:11:27Z",
+      "bytes": 5618305,
+      "sha256": "ffda064647a3e7c7eb473d5fcde944f4800c5ce3a7c1f3dfcf131b95dcd30f60"
+    }
+  ],
+  "evaluatedTargets": [
+    {
+      "soundTestTargetID": "knock",
+      "mid": "/m/07r4wb8",
+      "strongDisplayName": "Knock",
+      "modelDisplayName": "Knock",
+      "evaluationAnnotationRows": 109,
+      "evaluationUniqueClipIDs": 33
+    },
+    {
+      "soundTestTargetID": "bark",
+      "mid": "/m/05tny_",
+      "strongDisplayName": "Bark",
+      "modelDisplayName": "Bark",
+      "evaluationAnnotationRows": 547,
+      "evaluationUniqueClipIDs": 161
+    },
+    {
+      "soundTestTargetID": "cough",
+      "mid": "/m/01b_21",
+      "strongDisplayName": "Cough",
+      "modelDisplayName": "Cough",
+      "evaluationAnnotationRows": 375,
+      "evaluationUniqueClipIDs": 151
+    },
+    {
+      "soundTestTargetID": "horn",
+      "mid": "/m/0912c9",
+      "strongDisplayName": "Vehicle horn, car horn, honking, toot",
+      "modelDisplayName": "Vehicle horn, car horn, honking",
+      "evaluationAnnotationRows": 297,
+      "evaluationUniqueClipIDs": 145,
+      "mappingNote": "Display names differ despite sharing the same MID. Dataset mappings must use MID rather than comparing label strings or integer class indices across resources."
+    }
+  ],
+  "scopeAndLimitations": [
+    "Counts apply only to the exact continuous-time evaluation TSV version above, not to all AudioSet resources, training data, or the separate 960 ms framed positive/negative subset.",
+    "Annotation row count is not unique source count, unique recording count, or number of presently downloadable audio files. A clip can contain several events and more than one target class, so per-class clip counts must not be summed as a dataset-wide unique total.",
+    "The official strong release covers 456 distinct MIDs; it is not the same vocabulary as the original 527-class AudioSet classification release. This check confirms coverage of these four MIDs only.",
+    "Within audioset_eval_strong.tsv, event start/end offsets are relative to the annotated 10-second excerpt. The clip_id contains the parent YouTube ID and excerpt start in milliseconds; these must not be confused with the event offsets.",
+    "A timestamp annotation does not establish a universal event-boundary error bound such as 0.1 seconds, and it does not make SoundTest's classification-window event estimates precise SED boundaries.",
+    "These metadata have the official CC BY 4.0 release terms. This does not grant rights to redistribute arbitrary source YouTube audio; audio availability and applicable source permissions require separate verification.",
+    "Future evaluation must keep threshold-tuning material separate from final evaluation and check for overlap with model training/fine-tuning sources. These counts do not establish independence from a model's training corpus."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "yamnet",
+  "name": "YAMNet",
+  "version": "MediaPipe audio_classifier/yamnet/float32/1",
+  "downloadedAt": "2026-09-21",
+  "source": "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite",
+  "referenceExample": "https://github.com/google-ai-edge/mediapipe-samples/tree/main/examples/audio_classifier/ios",
+  "runtime": "TensorFlow Lite C 2.17.0, CPU",
+  "license": "Apache-2.0",
+  "licenseEvidence": "The downloaded TFLITE_METADATA explicitly contains: Apache License. Version 2.0 http://www.apache.org/licenses/LICENSE-2.0.",
+  "sampleRate": 16000,
+  "channels": 1,
+  "inputType": "Float32 PCM, nominal range -1 to 1",
+  "inputShape": [15600],
+  "outputShape": [1, 521],
+  "windowSeconds": 0.975,
+  "classCount": 521,
+  "internalPrecision": "Metadata states 8 bit quantized internally; Float32 input/output. The upstream URL uses float32.",
+  "preprocessing": "Embedded in the original TFLite graph. No separately reimplemented spectrogram, VAD, softmax or normalization.",
+  "labels": "Extracted byte-for-byte from the model's associated yamnet_label_list.txt; original zero-based 521-class order.",
+  "files": [
+    {"path": "yamnet.tflite", "bytes": 4126810, "sha256": "4d8b4a53282dc83ef04e3e7dbc4fbc98082e34e44ed798e16c3a0cdd4c584faf"},
+    {"path": "yamnet_label_list.txt", "bytes": 6230, "sha256": "8e1267a120c1932b7273c0d0e0c5529edbb9a35512b437b1c8982baa59047051"},
+    {"path": "LICENSE", "bytes": 11512, "sha256": "5b17814bf0de8cf65069bc6d7cc38cff19fcaa864d243423ad3ef3db01b52385"}
+  ]
+}

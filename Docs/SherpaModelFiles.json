@@ -1,0 +1,74 @@
+[
+  {
+    "modelID": "zipformer",
+    "path": "ModelLibrary/zipformer/model.int8.onnx",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15/resolve/c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95/model.int8.onnx",
+    "revision": "c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95",
+    "sizeBytes": 27038066,
+    "sha256": "69304b8a1b96bbe6b7d16c24079f0732c65faf3568a14cb82a8238c709afe76c"
+  },
+  {
+    "modelID": "zipformer",
+    "path": "ModelLibrary/zipformer/class_labels_indices.csv",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15/resolve/c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95/class_labels_indices.csv",
+    "revision": "c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95",
+    "sizeBytes": 14675,
+    "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429"
+  },
+  {
+    "modelID": "zipformer",
+    "path": "ModelLibrary/zipformer/README.md",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15/resolve/c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95/README.md",
+    "revision": "c24f9d0fdf7d0b8c0c4f9733aa0cac51fda10c95",
+    "sizeBytes": 243,
+    "sha256": "a00e3521a62cf6d6fc6fc9b0ce1779cf637ffab77b017e7cf48851cb187909a6"
+  },
+  {
+    "modelID": "cedTiny",
+    "path": "ModelLibrary/cedTiny/model.int8.onnx",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-tiny-audio-tagging-2024-04-19/resolve/efe3a5cfad74e56598d855d055006903adc00e38/model.int8.onnx",
+    "revision": "efe3a5cfad74e56598d855d055006903adc00e38",
+    "sizeBytes": 6133417,
+    "sha256": "73aa22e783115f6a4ae169b36089907e07d0fd44795595eddea9c1bfc74cc945"
+  },
+  {
+    "modelID": "cedTiny",
+    "path": "ModelLibrary/cedTiny/class_labels_indices.csv",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-tiny-audio-tagging-2024-04-19/resolve/efe3a5cfad74e56598d855d055006903adc00e38/class_labels_indices.csv",
+    "revision": "efe3a5cfad74e56598d855d055006903adc00e38",
+    "sizeBytes": 14675,
+    "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429"
+  },
+  {
+    "modelID": "cedTiny",
+    "path": "ModelLibrary/cedTiny/README.md",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-tiny-audio-tagging-2024-04-19/resolve/efe3a5cfad74e56598d855d055006903adc00e38/README.md",
+    "revision": "efe3a5cfad74e56598d855d055006903adc00e38",
+    "sizeBytes": 89,
+    "sha256": "a8468222b4a3ca1cb7fcaf14c31d7e11b7b2660ef44aadf411f9f9fd9672987b"
+  },
+  {
+    "modelID": "cedMini",
+    "path": "ModelLibrary/cedMini/model.int8.onnx",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-mini-audio-tagging-2024-04-19/resolve/4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d/model.int8.onnx",
+    "revision": "4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d",
+    "sizeBytes": 10451715,
+    "sha256": "ff29f39f9fbe637f72535160e9d006d61d872fdab0fce838672265b9b38cf946"
+  },
+  {
+    "modelID": "cedMini",
+    "path": "ModelLibrary/cedMini/class_labels_indices.csv",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-mini-audio-tagging-2024-04-19/resolve/4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d/class_labels_indices.csv",
+    "revision": "4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d",
+    "sizeBytes": 14675,
+    "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429"
+  },
+  {
+    "modelID": "cedMini",
+    "path": "ModelLibrary/cedMini/README.md",
+    "source": "https://huggingface.co/k2-fsa/sherpa-onnx-ced-mini-audio-tagging-2024-04-19/resolve/4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d/README.md",
+    "revision": "4da6df50dc47b25f91074b5ef7df4c1cc0dd7d4d",
+    "sizeBytes": 89,
+    "sha256": "a8468222b4a3ca1cb7fcaf14c31d7e11b7b2660ef44aadf411f9f9fd9672987b"
+  }
+]
