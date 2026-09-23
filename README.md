@@ -1,6 +1,33 @@
+<div align="center">
+
+<img src="SoundTest/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="128" height="128" alt="SoundTest iOS 应用图标">
+
 # SoundTest
 
+### iPhone、iPad 与 Apple Watch 的本地声音事件和环境场景测试工具
+
+[![Version](https://img.shields.io/badge/version-2.0.0-2563eb?style=flat-square)](SoundTest.xcodeproj/project.pbxproj)
+[![iOS](https://img.shields.io/badge/iOS-17%2B-111827?style=flat-square)](#打开与运行)
+[![watchOS](https://img.shields.io/badge/watchOS-10%2B-111827?style=flat-square)](#apple-watch-配套-app)
+[![Models](https://img.shields.io/badge/iOS%20models-6-0f766e?style=flat-square)](#首批模型)
+[![Offline](https://img.shields.io/badge/inference-on--device-0f766e?style=flat-square)](#打开与运行)
+[![License](https://img.shields.io/badge/license-Apache--2.0-64748b?style=flat-square)](LICENSE)
+
+[项目速览](#项目速览) · [打开与运行](#打开与运行) · [首批模型](#首批模型) · [三个页面](#三个页面) · [Apple Watch](#apple-watch-配套-app) · [测试方式](#测试方式) · [验证与后续](#验证与后续) · [许可与来源](#许可与版权边界)
+
+</div>
+
 SoundTest 2.0.0 是本地运行的 iPhone、iPad 声音事件与环境场景测试工具，并提供配套 Apple Watch 声音事件测试 App。复用 ASRtest 的录音会话管理、输入源选择、资源校验、本地日志和原生界面处理。原 ASRtest 保持独立，SoundTest 不包含旧 ASR 权重。
+
+## 项目速览
+
+| 项目 | 当前工程 |
+|---|---|
+| 应用版本 | `2.0.0` |
+| iPhone / iPad | 五组声音事件模型、一组环境场景模型；支持录音、导入与批量 WAV 测试 |
+| Apple Watch | 本地使用 Apple Sound Analysis 或 YAMNet Core ML；提供向配对 iPhone 传输日志的流程 |
+| 数据处理 | 音频和模型推理留在设备上；原始录音默认不保存 |
+| 工程与许可 | `SoundTest.xcodeproj`；项目源码采用 [Apache-2.0](LICENSE)，第三方材料见 [许可与来源](#许可与版权边界) |
 
 ## 许可与版权边界
 
