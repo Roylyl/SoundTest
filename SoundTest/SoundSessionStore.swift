@@ -9,7 +9,7 @@ struct SoundSessionStore {
         directory.appendingPathComponent(UUID(uuidString: id) == nil ? "invalid-session" : id).appendingPathExtension("json")
     }
     static func save(_ record: SoundRecord) throws {
-        guard UUID(uuidString: record.id) != nil, record.schemaVersion == 1 else { throw SoundError.message("日志标识或版本无效。") }
+        guard UUID(uuidString: record.id) != nil, (1...2).contains(record.schemaVersion) else { throw SoundError.message("日志标识或版本无效。") }
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         var location = directory
         var values = URLResourceValues(); values.isExcludedFromBackup = true
@@ -26,7 +26,7 @@ struct SoundSessionStore {
         let values = try file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey])
         guard values.isRegularFile == true, values.isSymbolicLink != true, (values.fileSize ?? 0) <= 512_000_000 else { throw SoundError.message("日志损坏或大小超出可读取范围。") }
         let record = try JSONDecoder().decode(SoundRecord.self, from: Data(contentsOf: file))
-        guard record.id == id, record.schemaVersion == 1 else { throw SoundError.message("日志标识或版本不匹配。") }
+        guard record.id == id, (1...2).contains(record.schemaVersion) else { throw SoundError.message("日志标识或版本不匹配。") }
         return record
     }
     static func all() -> [SoundRecord] {
@@ -36,7 +36,7 @@ struct SoundSessionStore {
             guard let v = try? file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey]),
                   v.isRegularFile == true, v.isSymbolicLink != true, (v.fileSize ?? 0) <= 1_000_000,
                   let data = try? Data(contentsOf: file), let record = try? JSONDecoder().decode(SoundRecord.self, from: data),
-                  record.schemaVersion == 1, UUID(uuidString: record.id) != nil,
+                  (1...2).contains(record.schemaVersion), UUID(uuidString: record.id) != nil,
                   file.deletingPathExtension().deletingPathExtension().lastPathComponent == record.id,
                   FileManager.default.fileExists(atPath: url(record.id).path) else { return nil }
             return record
@@ -44,7 +44,12 @@ struct SoundSessionStore {
     }
     static func delete(_ record: SoundRecord) throws {
         guard UUID(uuidString: record.id) != nil else { throw SoundError.message("日志标识无效。") }
-        try FileManager.default.removeItem(at: url(record.id))
+        if FileManager.default.fileExists(atPath: url(record.id).path) { try FileManager.default.removeItem(at: url(record.id)) }
         if FileManager.default.fileExists(atPath: summaryURL(record.id).path) { try FileManager.default.removeItem(at: summaryURL(record.id)) }
+    }
+    /// The optional location exists for isolated filesystem tests. Production callers
+    /// clear only Sessions; imported audio, Samples and model files live elsewhere.
+    static func clear(at location: URL = directory) throws {
+        if FileManager.default.fileExists(atPath: location.path) { try FileManager.default.removeItem(at: location) }
     }
 }

@@ -8,7 +8,7 @@ final class SherpaTagger: TaggingEngine {
     private let labels: [Int: String]
 
     init(modelID: SoundModelID, modelURL: URL, labelsURL: URL, threads: Int) throws {
-        guard modelID != .yamnet else { throw SherpaTaggerError.invalidModel }
+        guard [.zipformer, .cedTiny, .cedMini].contains(modelID) else { throw SherpaTaggerError.invalidModel }
         guard FileManager.default.isReadableFile(atPath: modelURL.path),
               FileManager.default.isReadableFile(atPath: labelsURL.path) else {
             throw SherpaTaggerError.missingFiles
@@ -75,7 +75,7 @@ final class SherpaTagger: TaggingEngine {
         return scores.sorted { $0.index < $1.index }
     }
 
-    private static func readLabels(_ url: URL) throws -> [Int: String] {
+    static func readLabels(_ url: URL) throws -> [Int: String] {
         let text = try String(contentsOf: url, encoding: .utf8)
         var labels: [Int: String] = [:]
         for line in text.split(whereSeparator: \.isNewline).dropFirst() {

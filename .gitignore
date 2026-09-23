@@ -1,63 +1,71 @@
-# macOS
+# macOS and editor files
 .DS_Store
 .AppleDouble
 .LSOverride
 ._*
+*.swp
+*.swo
+*~
+*.tmp
+.idea/
+.vscode/
 
-# Xcode user state
-xcuserdata/
-*.xcuserstate
-*.xcscmblueprint
-*.xccheckout
-*.moved-aside
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-
-# Xcode and Swift build products
+# Xcode, SwiftPM and compiled output
 Build/
 build/
 DerivedData/
 SourcePackages/
 .build/
 .swiftpm/
-*.app
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.app/
 *.ipa
-*.xcarchive
+*.xcarchive/
+*.xcresult/
 *.dSYM/
 *.dSYM.zip
 *.hmap
-*.xcresult/
 *.profdata
 .coverage
 
-# Local configuration, signing material and secrets
+# Personal settings and signing material
 Config/Local.xcconfig
 .env
 .env.*
 !.env.example
 *.mobileprovision
+*.provisionprofile
 *.p12
+*.p8
 *.cer
-*.key
 *.pem
+*.key
 
 # Generated logs, previews and test evidence
 *.log
 Preview/
 Tests/Artifacts/
+Tests/Unit/Fixtures/EfficientATBatch500/
 Docs/Archive/
 
-# Temporary editor and tooling files
-*.tmp
-*.swp
-*.swo
-*~
+# Local research checkouts and conversion environments
+Research/
+.venv/
+.venv-asc/
+**/.git/
+__pycache__/
+*.py[cod]
+Scripts/EfficientAT/EfficientAT/
+Scripts/EfficientAT/assets/
+Scripts/EfficientAT/.venv/
 
-# Intentionally tracked: ModelLibrary/, Packages/ binaries, license files,
-# ModelsManifest.json and Tests/Unit/Fixtures/. Large binaries use Git LFS.
+# ModelLibrary, Packages, licenses, manifests and small test fixtures are
+# project inputs. Large model and runtime files are tracked through Git LFS.

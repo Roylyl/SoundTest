@@ -25,34 +25,48 @@ final class AnalysisTests: XCTestCase {
 
     func testIndependentTargetsCanPromptSimultaneously() {
         let options = SoundOptions()
-        let values = EventAnalysis.targets(scores: [score("Bark", 0.8, index: 75),
-            score("Cough", 0.7, index: 42), score("Knock", 0.1, index: 366)], options: options)
-        XCTAssertEqual(Set(values.filter(\.prompted).map(\.id)), Set(["bark", "cough"]))
-        XCTAssertEqual(values.first { $0.id == "bark" }?.originalLabel, "Bark")
+        let values = EventAnalysis.targets(scores: [score("Meow", 0.8, index: 79),
+            score("Cough", 0.7, index: 42), score("Dog", 0.99, index: 70)], options: options)
+        XCTAssertEqual(Set(values.filter(\.prompted).map(\.id)), Set(["petVocalization", "cough"]))
+        XCTAssertEqual(values.first { $0.id == "petVocalization" }?.originalLabel, "Meow")
         var events: [EventEstimate] = []
         EventAnalysis.append(window(index: 0, start: 0, end: 10,
-            scores: [score("Bark", 0.8), score("Cough", 0.7, index: 1)], options: options),
+            scores: [score("Meow", 0.8), score("Cough", 0.7, index: 1)], options: options),
             to: &events, options: options)
-        XCTAssertEqual(Set(events.map(\.categoryID)), Set(["bark", "cough"]))
+        XCTAssertEqual(Set(events.map(\.categoryID)), Set(["petVocalization", "cough"]))
     }
 
     func testMissingTargetRemainsNilAndParentLabelDoesNotSubstitute() {
-        let values = EventAnalysis.targets(scores: [score("Dog", 0.99), score("Speech", 0.9, index: 1)],
+        let values = EventAnalysis.targets(scores: [score("Dog", 0.99), score("Cat", 0.98, index: 1),
+            score("Domestic animals, pets", 0.97, index: 2)],
                                            options: SoundOptions())
-        let bark = values.first { $0.id == "bark" }
-        XCTAssertNil(bark?.score)
-        XCTAssertNil(bark?.originalLabel)
-        XCTAssertFalse(bark?.prompted ?? true)
+        let pet = values.first { $0.id == "petVocalization" }
+        XCTAssertNil(pet?.score)
+        XCTAssertNil(pet?.originalLabel)
+        XCTAssertFalse(pet?.prompted ?? true)
         XCTAssertFalse(values.contains(where: \.prompted))
     }
 
-    func testBelowThresholdDoesNotPromptAndExtensionSettingIsRespected() {
+    func testGroupedTargetUsesHighestRawLabelAndItsOwnThreshold() {
         var options = SoundOptions()
-        options.thresholds["bark"] = 0.8
-        let raw = [score("Bark", 0.799), score("Doorbell", 0.95, index: 1)]
-        XCTAssertFalse(EventAnalysis.targets(scores: raw, options: options).contains(where: \.prompted))
-        options.includeExtensions = true
-        XCTAssertEqual(EventAnalysis.targets(scores: raw, options: options).filter(\.prompted).map(\.id), ["doorbell"])
+        options.thresholds["applause"] = 0.8
+        let raw = [score("Clapping", 0.799), score("Applause", 0.95, index: 1)]
+        let target = EventAnalysis.targets(scores: raw, options: options).first { $0.id == "applause" }
+        XCTAssertEqual(target?.score ?? 0, 0.95, accuracy: 0.000001)
+        XCTAssertEqual(target?.originalLabel, "Applause")
+        XCTAssertTrue(target?.prompted ?? false)
+    }
+
+    func testGroupedTargetsChooseMaximumWithoutSummingRelatedLabels() {
+        let raw = [score("Meow", 0.41), score("Bark", 0.62, index: 1),
+                   score("Laughter", 0.70, index: 2), score("Giggle", 0.80, index: 3)]
+        let targets = EventAnalysis.targets(scores: raw, options: SoundOptions())
+        let pet = targets.first { $0.id == "petVocalization" }
+        XCTAssertEqual(pet?.score ?? 0, 0.62, accuracy: 0.000001)
+        XCTAssertEqual(pet?.originalLabel, "Bark")
+        let laughter = targets.first { $0.id == "laughter" }
+        XCTAssertEqual(laughter?.score ?? 0, 0.80, accuracy: 0.000001)
+        XCTAssertEqual(laughter?.originalLabel, "Giggle")
     }
 
     func testExactFullWindowDoesNotCreateDuplicateTail() {
@@ -77,7 +91,7 @@ final class AnalysisTests: XCTestCase {
     func testShortInputPreservesRealEvidenceBoundsDespitePadding() {
         let options = SoundOptions()
         XCTAssertEqual(allRanges(total: 8_000, options: options), [0..<8_000])
-        let short = window(index: 0, start: 0, end: 0.5, scores: [score("Bark", 0.8)], options: options)
+        let short = window(index: 0, start: 0, end: 0.5, scores: [score("Meow", 0.8)], options: options)
         XCTAssertEqual(short.modelInputSeconds, 10)
         XCTAssertEqual(short.paddedSeconds, 9.5)
         var events: [EventEstimate] = []
@@ -94,7 +108,7 @@ final class AnalysisTests: XCTestCase {
         let options = SoundOptions()
         var events: [EventEstimate] = []
         EventAnalysis.append(window(index: 0, start: 0, end: 10,
-            scores: [score("Bark", 0.7)], options: options), to: &events, options: options)
+            scores: [score("Meow", 0.7)], options: options), to: &events, options: options)
         XCTAssertEqual(events[0].evidenceStart, 0)
         XCTAssertEqual(events[0].evidenceEnd, 10)
         XCTAssertEqual(events[0].estimatedStart, 4)
@@ -105,16 +119,16 @@ final class AnalysisTests: XCTestCase {
         let options = SoundOptions()
         var events: [EventEstimate] = []
         EventAnalysis.append(window(index: 0, start: 0, end: 10,
-            scores: [score("Bark", 0.7)], options: options), to: &events, options: options)
+            scores: [score("Meow", 0.7)], options: options), to: &events, options: options)
         EventAnalysis.append(window(index: 1, start: 2, end: 12,
             scores: [score("Bark", 0.9), score("Cough", 0.8, index: 1)], options: options),
             to: &events, options: options)
         XCTAssertEqual(events.count, 2)
-        let bark = events.first { $0.categoryID == "bark" }!
-        XCTAssertEqual(bark.windowIndices, [0, 1])
-        XCTAssertEqual(bark.peakScore, 0.9)
-        XCTAssertEqual(bark.evidenceEnd, 12)
-        XCTAssertEqual(bark.estimatedEnd, 8)
+        let pet = events.first { $0.categoryID == "petVocalization" }!
+        XCTAssertEqual(pet.windowIndices, [0, 1])
+        XCTAssertEqual(pet.peakScore, 0.9)
+        XCTAssertEqual(pet.evidenceEnd, 12)
+        XCTAssertEqual(pet.estimatedEnd, 8)
     }
 
     func testConfiguredGapControlsEventMerge() {
@@ -122,7 +136,7 @@ final class AnalysisTests: XCTestCase {
             var options = SoundOptions(); options.mergeGapSeconds = gap
             var events: [EventEstimate] = []
             EventAnalysis.append(window(index: 0, start: 0, end: 10,
-                scores: [score("Bark", 0.7)], options: options), to: &events, options: options)
+                scores: [score("Meow", 0.7)], options: options), to: &events, options: options)
             EventAnalysis.append(window(index: 1, start: 4, end: 14,
                 scores: [score("Bark", 0.8)], options: options), to: &events, options: options)
             return events.count
@@ -161,9 +175,9 @@ final class AnalysisTests: XCTestCase {
 
     func testNonfiniteThresholdAndMissingThresholdAreRejected() {
         var options = SoundOptions()
-        options.thresholds["bark"] = .nan
+        options.thresholds["petVocalization"] = .nan
         XCTAssertThrowsError(try options.validated(for: .zipformer))
-        options.thresholds.removeValue(forKey: "bark")
+        options.thresholds.removeValue(forKey: "petVocalization")
         XCTAssertThrowsError(try options.validated(for: .zipformer))
     }
 

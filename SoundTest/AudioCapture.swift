@@ -154,7 +154,9 @@ final class AudioCapture: @unchecked Sendable {
 
     deinit { observers.forEach { NotificationCenter.default.removeObserver($0) } }
 
-    func start(preferredUID: String? = nil) async throws -> CaptureInfo {
+    private var outputSampleRate = 16000.0
+
+    func start(preferredUID: String? = nil, sampleRate: Double = 16000) async throws -> CaptureInfo {
         let current = SoundCaptureTicket()
         let allowed = withLock { () -> Bool in
             guard state == .idle else { return false }
@@ -173,6 +175,7 @@ final class AudioCapture: @unchecked Sendable {
                 do {
                     try current.check()
                     guard !interrupted else { throw SoundAudioError.message("音频会话仍被系统占用，请稍后重试。") }
+                    outputSampleRate = sampleRate
                     activeTicket = current
                     try configureSession()
                     let session = AVAudioSession.sharedInstance()
@@ -197,7 +200,7 @@ final class AudioCapture: @unchecked Sendable {
                           format.commonFormat == .pcmFormatFloat32, !format.isInterleaved else {
                         throw SoundAudioError.message("当前麦克风格式不可用，请重新连接设备。")
                     }
-                    resampler = try MonoAudioResampler(inputRate: format.sampleRate)
+                    resampler = try MonoAudioResampler(inputRate: format.sampleRate, outputRate: outputSampleRate)
                     let gate = gate, queue = queue
                     audio.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(format.sampleRate / 10), format: format) { [weak self] buffer, _ in
                         gate.submit(buffer, queue: queue, consume: { [weak self] mono in
@@ -205,7 +208,7 @@ final class AudioCapture: @unchecked Sendable {
                             do {
                                 guard let resampler = self.resampler else { return }
                                 let values = try resampler.process(mono)
-                                if !values.isEmpty { self.onSamples?(values, AudioFileIO.sampleRate) }
+                                if !values.isEmpty { self.onSamples?(values, self.outputSampleRate) }
                             } catch { self.failActive(error.localizedDescription) }
                         }, fail: { [weak self] message in
                             self?.queue.async { [weak self] in self?.failActive(message) }
@@ -218,7 +221,7 @@ final class AudioCapture: @unchecked Sendable {
                     let startedUptime = ProcessInfo.processInfo.systemUptime
                     let info = CaptureInfo(actualInput: actual, actualInputUID: route.map(\.uid).joined(separator: ","),
                                            hardwareSampleRate: format.sampleRate, hardwareChannels: Int(format.channelCount),
-                                           sampleRate: AudioFileIO.sampleRate, startedUptime: startedUptime)
+                                           sampleRate: outputSampleRate, startedUptime: startedUptime)
                     try withLock {
                         try current.open(gate)
                         if ticket === current { state = .recording }
@@ -268,7 +271,7 @@ final class AudioCapture: @unchecked Sendable {
         let session = AVAudioSession.sharedInstance()
         // Default mode preserves environmental audio; no voice processing or speech activity gate.
         try session.setCategory(.record, mode: .default, options: [.allowBluetoothHFP])
-        try session.setPreferredSampleRate(AudioFileIO.sampleRate)
+        try session.setPreferredSampleRate(outputSampleRate)
     }
 
     private func scheduleRefresh() {
@@ -327,7 +330,7 @@ final class AudioCapture: @unchecked Sendable {
         if flush, let resampler {
             do {
                 let remaining = try resampler.finish()
-                if !remaining.isEmpty { onSamples?(remaining, AudioFileIO.sampleRate) }
+                if !remaining.isEmpty { onSamples?(remaining, outputSampleRate) }
             } catch { publishError("结束音频转换失败：\(error.localizedDescription)") }
         }
         resampler = nil

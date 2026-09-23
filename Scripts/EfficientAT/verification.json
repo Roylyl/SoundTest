@@ -1,0 +1,167 @@
+{
+  "source_commit": "a425fdce92572e602a1d5634799bd9f1f2efa806",
+  "official_weights_url": "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/mn10_as_mAP_471.pt",
+  "weights_sha256": "0bd7dc2443af498c289a2e739f02ebb515d6aa3fd3ab9db539c86123ae368a4e",
+  "onnx_sha256": "4ca271b035e3194ff49717c9c62909913d566ed4f3a1ff365238c9fce21368c4",
+  "onnx_bytes": 19515407,
+  "opset": 17,
+  "onnx_input_shape": [
+    1,
+    1,
+    128,
+    1000
+  ],
+  "onnx_output_shape": [
+    1,
+    527
+  ],
+  "torch_version": "2.5.1",
+  "onnx_version": "1.17.0",
+  "onnxruntime_version": "1.20.1",
+  "tests": {
+    "official_metro_audio": {
+      "shape": [
+        1,
+        527
+      ],
+      "max_abs_error": 4.76837158203125e-07,
+      "mean_abs_error": 2.5460119346121246e-08,
+      "max_relative_error_gt_1e_3": 0.00010241637210128829,
+      "torch_minmax": [
+        2.6892378173215548e-06,
+        0.8111657500267029
+      ],
+      "onnx_minmax": [
+        2.7120113372802734e-06,
+        0.8111658096313477
+      ]
+    },
+    "deterministic_random_mel": {
+      "shape": [
+        1,
+        527
+      ],
+      "max_abs_error": 2.3096799850463867e-07,
+      "mean_abs_error": 2.593314007981462e-08,
+      "max_relative_error_gt_1e_3": 0.000111409455712419,
+      "torch_minmax": [
+        2.0751510021455033e-07,
+        0.1052306517958641
+      ],
+      "onnx_minmax": [
+        2.384185791015625e-07,
+        0.1052304208278656
+      ]
+    }
+  },
+  "dynamic_time": {
+    "input_shape": [
+      1,
+      1,
+      128,
+      "frames"
+    ],
+    "onnx_sha256": "603e6c05579c41121a503fba6b448badfd81490cb5563374b2e43cf766391071",
+    "onnx_bytes": 19515412,
+    "tests": {
+      "500": {
+        "shape": [
+          1,
+          527
+        ],
+        "max_abs_error": 1.341104507446289e-07,
+        "mean_abs_error": 2.5031395622931996e-08,
+        "max_relative_error_gt_1e_3": 0.00011964583973167464,
+        "torch_minmax": [
+          4.221464223519433e-06,
+          0.12946362793445587
+        ],
+        "onnx_minmax": [
+          4.202127456665039e-06,
+          0.12946349382400513
+        ]
+      },
+      "1000": {
+        "shape": [
+          1,
+          527
+        ],
+        "max_abs_error": 2.905726432800293e-07,
+        "mean_abs_error": 2.6305404077220373e-08,
+        "max_relative_error_gt_1e_3": 9.618815238354728e-05,
+        "torch_minmax": [
+          2.0751510021455033e-07,
+          0.1052306517958641
+        ],
+        "onnx_minmax": [
+          2.384185791015625e-07,
+          0.10523036122322083
+        ]
+      }
+    }
+  },
+  "labels_count": 527,
+  "labels_sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429",
+  "official_audio_top10": [
+    [
+      329,
+      "/m/07jdr",
+      "Train",
+      0.8111657500267029
+    ],
+    [
+      328,
+      "/m/06d_3",
+      "Rail transport",
+      0.6489912867546082
+    ],
+    [
+      332,
+      "/m/01g50p",
+      "Railroad car, train wagon",
+      0.6304642558097839
+    ],
+    [
+      334,
+      "/m/0195fx",
+      "Subway, metro, underground",
+      0.5511268377304077
+    ],
+    [
+      300,
+      "/m/07yv9",
+      "Vehicle",
+      0.3276776969432831
+    ],
+    [
+      492,
+      "/m/07rwm0c",
+      "Clickety-clack",
+      0.17791031301021576
+    ],
+    [
+      0,
+      "/m/09x0r",
+      "Speech",
+      0.06232686713337898
+    ],
+    [
+      509,
+      "/t/dd00128",
+      "Outside, urban or manmade",
+      0.029439162462949753
+    ],
+    [
+      137,
+      "/m/04rlf",
+      "Music",
+      0.025336632505059242
+    ],
+    [
+      333,
+      "/t/dd00048",
+      "Train wheels squealing",
+      0.021212881430983543
+    ]
+  ]
+}

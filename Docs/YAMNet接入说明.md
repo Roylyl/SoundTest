@@ -27,7 +27,7 @@
 - 同一模拟器对官方示例 `speech_16000_hz_mono.wav` 前 15,600 个样本运行真实推理：最高类 `Speech`（索引 0）为 0.91796875，全部 521 个分数在 [0, 1]。
 - 检查模型标签与嵌入文件逐字节一致，标签未套用其他 AudioSet 模型的 527 类索引。
 
-以上证明运行库与模型可以执行，不代表环境声识别准确率。敲门、狗叫、咳嗽、喇叭的准确表现、混合声音、输入切换、长期监听、真实延迟与发热，仍需使用统一用例在 iPhone 实测。模拟器烟雾验证源码位于 `Packages/YAMNetRuntime/Tools/smoke.c`；测试样本未打包到 App。
+以上证明运行库与模型可以执行，不代表环境声识别准确率。猫狗叫声、咳嗽、笑声、鼓掌的实际表现，以及混合声音、输入切换、长期监听、真实延迟与发热，仍需使用统一用例在 iPhone 实测。模拟器烟雾验证源码位于 `Packages/YAMNetRuntime/Tools/smoke.c`；测试样本未打包到 App。
 ## 参考来源
 官方 iOS 示例：https://github.com/google-ai-edge/mediapipe-samples/tree/main/examples/audio_classifier/ios
 官方模型下载脚本：https://raw.githubusercontent.com/google-ai-edge/mediapipe-samples/main/examples/audio_classifier/ios/RunScripts/download_models.sh

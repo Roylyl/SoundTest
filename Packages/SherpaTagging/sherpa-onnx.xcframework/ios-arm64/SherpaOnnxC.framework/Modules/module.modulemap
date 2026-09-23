@@ -1,3 +1,4 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b8a4f253774183fa531116df4772eca938f310908745e1be1e01d67eb1288ab2
-size 81
+framework module SherpaOnnxC {
+  header "sherpa-onnx/c-api/c-api.h"
+  export *
+}

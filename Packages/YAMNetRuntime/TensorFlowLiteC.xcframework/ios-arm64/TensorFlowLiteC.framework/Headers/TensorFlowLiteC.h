@@ -1,3 +1,11 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:282115fed0aff7e2c40e3136ddac0ff106715664676e63ba043e5074d1d188a1
-size 436
+#import <TensorFlowLiteC/builtin_ops.h>
+#import <TensorFlowLiteC/c_api.h>
+#import <TensorFlowLiteC/c_api_experimental.h>
+#import <TensorFlowLiteC/c_api_opaque.h>
+#import <TensorFlowLiteC/c_api_types.h>
+#import <TensorFlowLiteC/common.h>
+#import <TensorFlowLiteC/operator.h>
+#import <TensorFlowLiteC/profiler.h>
+#import <TensorFlowLiteC/telemetry_setting.h>
+#import <TensorFlowLiteC/types.h>
+#import <TensorFlowLiteC/xnnpack_delegate.h>

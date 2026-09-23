@@ -1,0 +1,194 @@
+{
+  "source_repo": "https://github.com/fschmid56/EfficientAT",
+  "source_commit": "a425fdce92572e602a1d5634799bd9f1f2efa806",
+  "torch_version": "2.7.1",
+  "torchaudio_version": "2.7.1",
+  "input_wav": "golden_audio_10s_32k_mono_pcm16.wav",
+  "sample_rate_hz": 32000,
+  "pcm_samples": 320000,
+  "waveform_sample_values": {
+    "0": 0.0,
+    "1": 0.0,
+    "6400": 0.0,
+    "8000": 0.0,
+    "160000": 0.29998779296875,
+    "319999": 0.0
+  },
+  "preemphasis_length": 319999,
+  "stft_power_shape": [
+    1,
+    513,
+    1000
+  ],
+  "mel_shape": [
+    1,
+    128,
+    1000
+  ],
+  "model_input_shape": [
+    1,
+    1,
+    128,
+    1000
+  ],
+  "mel_range": [
+    -1.4025850296020508,
+    1.3733789920806885
+  ],
+  "mel_mean": -1.1377215385437012,
+  "mel_probes": {
+    "0,0": -1.4025850296020508,
+    "0,1": -1.4025850296020508,
+    "0,10": -1.4025850296020508,
+    "10,100": -1.244140625,
+    "31,500": -0.2698661684989929,
+    "64,500": 0.34459027647972107,
+    "127,999": -1.4025850296020508
+  },
+  "melbank_probes": {
+    "0,0": 0.0,
+    "0,1": 0.188595250248909,
+    "0,2": 0.0,
+    "0,3": 0.0,
+    "0,4": 0.0,
+    "10,30": 0.0,
+    "31,100": 0.0,
+    "64,200": 0.0,
+    "127,500": 0.0,
+    "127,512": 0.0
+  },
+  "hann_probes": {
+    "0": 0.0,
+    "1": 1.5437602996826172e-05,
+    "2": 6.183981895446777e-05,
+    "100": 0.14679431915283203,
+    "399": 0.9999961256980896,
+    "400": 0.9999961853027344,
+    "799": 0.0
+  },
+  "class_groups": {
+    "petVocalization": [
+      {
+        "index": 75,
+        "mid": "/m/05tny_",
+        "display_name": "Bark"
+      },
+      {
+        "index": 76,
+        "mid": "/m/07r_k2n",
+        "display_name": "Yip"
+      },
+      {
+        "index": 77,
+        "mid": "/m/07qf0zm",
+        "display_name": "Howl"
+      },
+      {
+        "index": 78,
+        "mid": "/m/07rc7d9",
+        "display_name": "Bow-wow"
+      },
+      {
+        "index": 79,
+        "mid": "/m/0ghcn6",
+        "display_name": "Growling"
+      },
+      {
+        "index": 80,
+        "mid": "/t/dd00136",
+        "display_name": "Whimper (dog)"
+      },
+      {
+        "index": 82,
+        "mid": "/m/02yds9",
+        "display_name": "Purr"
+      },
+      {
+        "index": 83,
+        "mid": "/m/07qrkrw",
+        "display_name": "Meow"
+      },
+      {
+        "index": 84,
+        "mid": "/m/07rjwbb",
+        "display_name": "Hiss"
+      },
+      {
+        "index": 85,
+        "mid": "/m/07r81j2",
+        "display_name": "Caterwaul"
+      }
+    ],
+    "cough": [
+      {
+        "index": 47,
+        "mid": "/m/01b_21",
+        "display_name": "Cough"
+      }
+    ],
+    "laughter": [
+      {
+        "index": 16,
+        "mid": "/m/01j3sz",
+        "display_name": "Laughter"
+      },
+      {
+        "index": 17,
+        "mid": "/t/dd00001",
+        "display_name": "Baby laughter"
+      },
+      {
+        "index": 18,
+        "mid": "/m/07r660_",
+        "display_name": "Giggle"
+      },
+      {
+        "index": 19,
+        "mid": "/m/07s04w4",
+        "display_name": "Snicker"
+      },
+      {
+        "index": 20,
+        "mid": "/m/07sq110",
+        "display_name": "Belly laugh"
+      },
+      {
+        "index": 21,
+        "mid": "/m/07rgt08",
+        "display_name": "Chuckle, chortle"
+      }
+    ],
+    "applause": [
+      {
+        "index": 63,
+        "mid": "/m/0l15bq",
+        "display_name": "Clapping"
+      },
+      {
+        "index": 67,
+        "mid": "/m/028ght",
+        "display_name": "Applause"
+      }
+    ]
+  },
+  "file_shapes": {
+    "melbank_128x513_f32le.bin": [
+      128,
+      513
+    ],
+    "hann800_f32le.bin": [
+      800
+    ],
+    "mel_10s_128x1000_f32le.bin": [
+      128,
+      1000
+    ]
+  },
+  "file_sha256": {
+    "melbank_128x513_f32le.bin": "e2024f719d9122b0876e8a3410e586a40e74ee9b62f402635fe2024b0433a49d",
+    "hann800_f32le.bin": "0c0d22798aa76bff12404eaa251c650b00751a2f6ac90783a7aaae2635531b1c",
+    "mel_10s_128x1000_f32le.bin": "4758814980b09f9269786d0e515ea8d6cdfa7637a1608c04ec249b4ad8eacf4e",
+    "golden_audio_10s_32k_mono_pcm16.wav": "24cc00989de5b58ca27376d73cef387635650c5618d2611528c028dd51ff22db",
+    "class_labels_indices.csv": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429"
+  }
+}

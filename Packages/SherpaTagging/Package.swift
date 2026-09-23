@@ -8,7 +8,11 @@ let package = Package(
     targets: [
         .binaryTarget(name: "SherpaOnnxC", path: "sherpa-onnx.xcframework"),
         .binaryTarget(name: "onnxruntime", path: "onnxruntime.xcframework"),
-        .target(name: "SherpaTagging", dependencies: ["SherpaOnnxC", "onnxruntime"],
+        .target(name: "ASCBridge", dependencies: ["onnxruntime"], publicHeadersPath: "include", linkerSettings: [.linkedLibrary("c++")]),
+        .target(name: "EfficientATBridge", dependencies: ["onnxruntime"], publicHeadersPath: "include",
+                linkerSettings: [.linkedLibrary("c++"), .linkedFramework("Accelerate")]),
+        .target(name: "SherpaTagging", dependencies: ["SherpaOnnxC", "onnxruntime", "ASCBridge", "EfficientATBridge"],
                 linkerSettings: [.linkedLibrary("c++"), .linkedFramework("Accelerate")])
-    ]
+    ],
+    cxxLanguageStandard: .cxx17
 )

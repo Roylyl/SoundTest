@@ -27,7 +27,7 @@ protocol TaggingEngine: AnyObject {
 }
 
 enum SoundModelID: String, CaseIterable, Codable, Identifiable, Sendable {
-    case zipformer, cedTiny, cedMini, yamnet
+    case zipformer, cedTiny, cedMini, yamnet, efficientAT, cpMobile
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -35,13 +35,22 @@ enum SoundModelID: String, CaseIterable, Codable, Identifiable, Sendable {
         case .cedTiny: return "CED-Tiny INT8"
         case .cedMini: return "CED-Mini INT8"
         case .yamnet: return "YAMNet"
+        case .efficientAT: return "EfficientAT mn10_as"
+        case .cpMobile: return "CP-Mobile 通用场景模型"
         }
     }
-    var number: String { ["zipformer":"M01", "cedTiny":"M02", "cedMini":"M03", "yamnet":"M04"][rawValue]! }
-    var framework: String { self == .yamnet ? "TensorFlow Lite C" : "sherpa-onnx Audio Tagging" }
-    var defaultWindow: Double { self == .yamnet ? 0.975 : 10 }
-    var defaultStep: Double { self == .yamnet ? 0.48 : 2 }
-    var expectedCount: Int { self == .yamnet ? 521 : 527 }
+    var number: String { ["zipformer":"M01", "cedTiny":"M02", "cedMini":"M03", "yamnet":"M04", "efficientAT":"M05", "cpMobile":"ASC01"][rawValue]! }
+    var framework: String {
+        switch self {
+        case .cpMobile: return "ONNX Runtime · CP-Mobile"
+        case .efficientAT: return "ONNX Runtime · EfficientAT"
+        case .yamnet: return "TensorFlow Lite C"
+        default: return "sherpa-onnx Audio Tagging"
+        }
+    }
+    var defaultWindow: Double { self == .cpMobile ? 1 : self == .yamnet ? 0.975 : 10 }
+    var defaultStep: Double { self == .cpMobile ? 1 : self == .yamnet ? 0.48 : 2 }
+    var expectedCount: Int { self == .cpMobile ? 10 : self == .yamnet ? 521 : 527 }
 }
 
 enum AnalysisMode: String, CaseIterable, Codable, Identifiable, Sendable {
@@ -60,8 +69,8 @@ struct SoundOptions: Codable, Equatable, Sendable {
     var stepSeconds = 2.0
     var mergeGapSeconds = 0.0
     var threads = 2
-    var includeExtensions = false
     var thresholds: [String: Double] = Dictionary(uniqueKeysWithValues: TargetCategory.all.map { ($0.id, 0.3) })
+    var scene: SceneOptions? = nil
     var mappingVersion = "soundtest-zh-v1"
     func validated(for model: SoundModelID) throws -> SoundOptions {
         guard windowSeconds.isFinite, stepSeconds.isFinite, mergeGapSeconds.isFinite,
@@ -72,11 +81,19 @@ struct SoundOptions: Codable, Equatable, Sendable {
               TargetCategory.all.allSatisfy({ thresholds[$0.id] != nil }) else {
             throw SoundError.message("分析参数无效，请恢复模型默认设置。")
         }
+        if model == .cpMobile {
+            guard abs(windowSeconds - 1) < 0.00001, [0.5, 1.0].contains(stepSeconds), (scene ?? SceneOptions()).valid else { throw SoundError.message("场景模型固定1秒窗口，步长0.5或1秒；请检查平滑设置。") }
+        }
         if model == .yamnet && abs(windowSeconds - 0.975) > 0.00001 {
             throw SoundError.message("YAMNet 使用固定 0.975 秒原生输入窗口。")
         }
-        if model != .yamnet && windowSeconds < 1 { throw SoundError.message("sherpa 分析窗口至少为1秒。") }
-        return self
+        if model == .efficientAT && abs(windowSeconds - 10) > 0.00001 {
+            throw SoundError.message("EfficientAT mn10_as 本版使用固定 10 秒输入窗口。")
+        }
+        if model != .yamnet && windowSeconds < 1 { throw SoundError.message("分析窗口至少为1秒。") }
+        var result = self
+        result.mappingVersion = model == .cpMobile ? "soundtest-asc-zh-v1" : "soundtest-zh-v1"
+        return result
     }
 }
 
@@ -84,18 +101,18 @@ struct TargetCategory: Identifiable, Sendable {
     let id: String
     let chinese: String
     let labels: [String]
-    let primary: Bool
-    // Exact labels, resolved in each model's own class list. Parent classes stay separate.
+    // Exact labels, resolved in each model's own class list. Broad parent classes such as
+    // Dog and Cat stay visible in raw scores but do not count as a vocalization hit.
     static let all = [
-        TargetCategory(id: "knock", chinese: "敲击（含敲门）", labels: ["Knock"], primary: true),
-        TargetCategory(id: "bark", chinese: "狗叫", labels: ["Bark"], primary: true),
-        TargetCategory(id: "cough", chinese: "咳嗽", labels: ["Cough"], primary: true),
-        TargetCategory(id: "horn", chinese: "汽车喇叭", labels: ["Vehicle horn, car horn, honking"], primary: true),
-        TargetCategory(id: "doorbell", chinese: "门铃", labels: ["Doorbell"], primary: false),
-        TargetCategory(id: "alarm", chinese: "警报", labels: ["Alarm"], primary: false),
-        TargetCategory(id: "water", chinese: "流水", labels: ["Water", "Water tap, faucet"], primary: false),
-        TargetCategory(id: "baby", chinese: "婴儿哭", labels: ["Baby cry, infant cry"], primary: false),
-        TargetCategory(id: "impact", chinese: "撞击声（不判定跌倒）", labels: ["Thump, thud"], primary: false)
+        TargetCategory(id: "petVocalization", chinese: "猫狗叫声", labels: [
+            "Bark", "Yip", "Howl", "Bow-wow", "Growling", "Whimper (dog)",
+            "Purr", "Meow", "Hiss", "Caterwaul"
+        ]),
+        TargetCategory(id: "cough", chinese: "咳嗽", labels: ["Cough"]),
+        TargetCategory(id: "laughter", chinese: "笑声", labels: [
+            "Laughter", "Baby laughter", "Giggle", "Snicker", "Belly laugh", "Chuckle, chortle"
+        ]),
+        TargetCategory(id: "applause", chinese: "鼓掌", labels: ["Clapping", "Applause"])
     ]
 }
 
@@ -105,8 +122,7 @@ struct TargetScore: Codable, Sendable, Identifiable {
     let score: Double?
     let originalLabel: String?
     let threshold: Double
-    var enabled = true
-    var prompted: Bool { enabled && (score.map { $0 >= threshold } ?? false) }
+    var prompted: Bool { score.map { $0 >= threshold } ?? false }
 }
 
 struct WindowResult: Codable, Sendable, Identifiable {
@@ -127,6 +143,7 @@ struct WindowResult: Codable, Sendable, Identifiable {
     let queueDelayMS: Double?
     var promptAfterWindowMS: Double?
     var trueEventLatencyMS: Double? = nil
+    var scene: ScenePrediction? = nil
     var top5: [RawScore] { Array(scores.sorted { $0.score > $1.score }.prefix(5)) }
 }
 
@@ -163,6 +180,7 @@ struct SoundModelAsset: Codable, Sendable, Identifiable {
 }
 
 struct MaterialInfo: Codable, Sendable {
+    var testCaseVersion: String? = "soundtest-s01-s17-v2"
     var testCase = "S01"
     var sampleID = ""
     var filename: String?
@@ -177,11 +195,15 @@ struct MaterialInfo: Codable, Sendable {
 }
 
 struct SoundRecord: Codable, Identifiable, Sendable {
-    var schemaVersion = 1
+    var schemaVersion = 2
+    // Optional additive metadata: legacy schema 1/2 single-file records still decode.
+    var batch: BatchRecordLink? = nil
+    var taskType: SoundTask? = nil
+    var effectiveTask: SoundTask { taskType ?? model.task }
     var id = UUID().uuidString
     var startedAt = Date()
     var endedAt: Date?
-    var appVersion = "1.0.0"
+    var appVersion = "2.0.0"
     let model: SoundModelID
     let asset: SoundModelAsset
     let options: SoundOptions
@@ -208,5 +230,10 @@ struct SoundRecord: Codable, Identifiable, Sendable {
 struct SoundTestCase: Identifiable {
     let id: String
     let name: String
-    static let all: [SoundTestCase] = zip(1...17, ["敲门", "狗叫", "咳嗽", "汽车喇叭", "背景噪声", "无目标 / 静音", "离线冷启动与切换", "重复启停与切换", "易混淆声音", "距离与朝向", "声音先后顺序", "多事件重叠", "短事件与窗口边界", "同文件与格式对照", "连续运行", "权限、输入与中断", "日志与导出"]).map { SoundTestCase(id: String(format: "S%02d", $0.0), name: $0.1) }
+    static let all: [SoundTestCase] = zip(1...17, [
+        "猫叫", "狗叫", "咳嗽", "笑声", "鼓掌", "静音与普通无目标", "猫狗易混淆声",
+        "咳嗽易混淆声", "笑声易混淆声", "鼓掌易混淆声", "目标叠加背景",
+        "不同目标先后出现", "两个目标同时出现", "短声、窗边界与文件尾",
+        "同类连续与间隔", "长时无目标运行", "长时背景插入目标"
+    ]).map { SoundTestCase(id: String(format: "S%02d", $0.0), name: $0.1) }
 }

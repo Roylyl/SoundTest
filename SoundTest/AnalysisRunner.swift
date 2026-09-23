@@ -7,6 +7,8 @@ final class AnalysisRunner: @unchecked Sendable {
     var onFinished: ((SoundRecord) -> Void)?
     var onFailure: ((String) -> Void)?
     var onDuration: ((Double) -> Void)?
+    private var sampleRate = 16000
+    private var sceneSmoother = SceneSmoother()
     private var engine: TaggingEngine?
     private var record: SoundRecord?
     private var planner: WindowPlanner?
@@ -36,7 +38,13 @@ final class AnalysisRunner: @unchecked Sendable {
                 let folder = store.folder(model)
                 let modelURL = folder.appendingPathComponent(asset.modelFile)
                 let labelsURL = folder.appendingPathComponent(asset.labelsFile)
-                if model == .yamnet {
+                if model == .cpMobile {
+                    self.engine = try CPMobileTagger(modelURL: modelURL, labelsURL: labelsURL, threads: threads)
+                } else if model == .efficientAT {
+                    self.engine = try EfficientATTagger(modelURL: modelURL, labelsURL: labelsURL,
+                        melURL: folder.appendingPathComponent("mel-bank.f32"),
+                        hannURL: folder.appendingPathComponent("hann-window.f32"), threads: threads)
+                } else if model == .yamnet {
                     self.engine = try YAMNetTagger(modelURL: modelURL, labelsURL: labelsURL, threads: threads)
                 } else {
                     self.engine = try SherpaTagger(modelID: model, modelURL: modelURL, labelsURL: labelsURL, threads: threads)
@@ -48,7 +56,9 @@ final class AnalysisRunner: @unchecked Sendable {
 
     func begin(_ record: SoundRecord, isLive: Bool, completion: @escaping () -> Void) {
         queue.async {
-            self.record = record; self.planner = WindowPlanner(options: record.options)
+            self.record = record; self.sampleRate = record.model.sampleRate
+            self.sceneSmoother = SceneSmoother()
+            self.planner = WindowPlanner(options: record.options, sampleRate: self.sampleRate)
             self.samples = []; self.baseIndex = 0; self.totalSamples = 0; self.lastProcessedEnd = 0
             self.live = isLive; self.startedUptime = ProcessInfo.processInfo.systemUptime
             self.previousFinishedUptime = self.startedUptime
@@ -64,7 +74,7 @@ final class AnalysisRunner: @unchecked Sendable {
         let arrivedAt = ProcessInfo.processInfo.systemUptime
         lock.lock()
         guard accepting else { lock.unlock(); return }
-        if pendingSamples + chunk.count > 16000 * 30 {
+        if pendingSamples + chunk.count > sampleRate * 30 {
             accepting = false; failed = true; lock.unlock()
             onFailure?("分析积压超过30秒，已停止本轮；没有静默跳窗。请增大步长或选择更轻的模型。")
             return
@@ -74,19 +84,19 @@ final class AnalysisRunner: @unchecked Sendable {
             self.lock.lock(); self.pendingSamples -= chunk.count; self.lock.unlock()
             guard self.record != nil else { return }
             do {
-                guard rate == 16000 else { throw SoundError.message("采集输出采样率不匹配：\(rate)。") }
+                guard rate == Double(self.sampleRate) else { throw SoundError.message("采集输出采样率不匹配：\(rate)。") }
                 if !self.firstAudioArrived {
                     self.startedUptime = arrivedAt - Double(chunk.count) / rate
                     self.firstAudioArrived = true
                 }
                 self.samples.append(contentsOf: chunk); self.totalSamples += chunk.count
                 // Explicit saving is offered only for short microphone clips, and audio stays in RAM.
-                if self.totalSamples <= 16000 * 60 { self.capturedForSaving.append(contentsOf: chunk) }
+                if self.totalSamples <= self.sampleRate * 60 { self.capturedForSaving.append(contentsOf: chunk) }
                 else { self.capturedForSaving.removeAll(keepingCapacity: false) }
-                self.onDuration?(Double(self.totalSamples) / 16000)
+                self.onDuration?(Double(self.totalSamples) / Double(self.sampleRate))
                 if self.record?.options.mode == .continuous && self.record?.error == nil { try self.consume(finishing: false) }
                 let limit = self.record?.options.mode == .segment ? 60 : 1800
-                if self.totalSamples >= 16000 * limit {
+                if self.totalSamples >= self.sampleRate * limit {
                     self.lock.lock(); self.accepting = false; self.lock.unlock()
                     self.onFailure?("已到本轮\(limit)秒上限，正在保存已采集结果。")
                 }
@@ -102,7 +112,7 @@ final class AnalysisRunner: @unchecked Sendable {
         queue.async {
             do {
                 self.samples = audio; self.totalSamples = audio.count
-                self.onDuration?(Double(audio.count) / 16000)
+                self.onDuration?(Double(audio.count) / Double(self.sampleRate))
                 try self.consume(finishing: true)
                 self.finishOnQueue(reason: nil, stopTime: nil)
             } catch { self.finishOnQueue(reason: error.localizedDescription, stopTime: nil) }
@@ -134,20 +144,22 @@ final class AnalysisRunner: @unchecked Sendable {
             let padding = max(0, plan.windowSamples - input.count)
             input.append(contentsOf: repeatElement(0, count: padding))
             let start = ProcessInfo.processInfo.systemUptime
-            let endPosition = Double(range.upperBound) / 16000
+            let endPosition = Double(range.upperBound) / Double(sampleRate)
             let queueDelay = live ? max(0, (start - startedUptime - endPosition) * 1000) : nil
-            let scores = try engine.classify(samples: input, sampleRate: 16000)
+            let scores = try engine.classify(samples: input, sampleRate: sampleRate)
             let elapsed = (ProcessInfo.processInfo.systemUptime - start) * 1000
             guard !scores.isEmpty, scores.allSatisfy({ $0.score.isFinite }),
                   Set(scores.map(\.index)).count == scores.count else { throw SoundError.message("模型返回了无效类别分数。") }
-            var window = WindowResult(index: record!.windows.count, start: Double(range.lowerBound) / 16000,
-                end: endPosition, modelInputSeconds: Double(input.count) / 16000,
-                paddedSeconds: Double(padding) / 16000, scores: scores,
-                targets: EventAnalysis.targets(scores: scores, options: options), inferenceMS: elapsed,
-                processingFinishedAt: Date(), windowCollectionSeconds: live ? Double(range.count) / 16000 : nil,
+            var window = WindowResult(index: record!.windows.count, start: Double(range.lowerBound) / Double(sampleRate),
+                end: endPosition, modelInputSeconds: Double(input.count) / Double(sampleRate),
+                paddedSeconds: Double(padding) / Double(sampleRate), scores: scores,
+                targets: record!.model.task == .events ? EventAnalysis.targets(scores: scores, options: options) : [], inferenceMS: elapsed,
+                processingFinishedAt: Date(), windowCollectionSeconds: live ? Double(range.count) / Double(sampleRate) : nil,
                 queueDelayMS: queueDelay, promptAfterWindowMS: live ? max(0, (ProcessInfo.processInfo.systemUptime - startedUptime - endPosition) * 1000) : nil)
             window.additionalAudioWaitMS = live ? max(0, (startedUptime + endPosition - previousFinishedUptime) * 1000) : nil
-            EventAnalysis.append(window, to: &record!.events, options: options)
+            if record!.model.task == .scenes {
+                window.scene = sceneSmoother.update(scores: scores, start: window.start, end: window.end, padded: padding > 0, options: options.scene ?? SceneOptions())
+            } else { EventAnalysis.append(window, to: &record!.events, options: options) }
             if let presented = onWindow?(window, record!.events) {
                 window.presentedAt = presented
                 if let delay = window.promptAfterWindowMS {
@@ -180,7 +192,7 @@ final class AnalysisRunner: @unchecked Sendable {
     private func finishOnQueue(reason: String?, stopTime: Double?) {
         guard var result = record else { return }
         record = nil
-        result.audioSeconds = Double(totalSamples) / 16000
+        result.audioSeconds = Double(totalSamples) / Double(sampleRate)
         result.endedAt = Date()
         result.stopWaitMS = stopTime.map { (ProcessInfo.processInfo.systemUptime - $0) * 1000 }
         if let reason { result.error = reason; result.anomalies.append(reason) }

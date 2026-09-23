@@ -21,6 +21,12 @@ final class ModelIntegrationTests: XCTestCase {
         let folder = store.folder(id)
         let modelURL = folder.appendingPathComponent(asset.modelFile)
         let labelsURL = folder.appendingPathComponent(asset.labelsFile)
+        if id == .cpMobile { return try CPMobileTagger(modelURL: modelURL, labelsURL: labelsURL, threads: 2) }
+        if id == .efficientAT {
+            return try EfficientATTagger(modelURL: modelURL, labelsURL: labelsURL,
+                melURL: folder.appendingPathComponent("mel-bank.f32"),
+                hannURL: folder.appendingPathComponent("hann-window.f32"), threads: 2)
+        }
         if id == .yamnet {
             return try YAMNetTagger(modelURL: modelURL, labelsURL: labelsURL, threads: 2)
         }
@@ -33,9 +39,9 @@ final class ModelIntegrationTests: XCTestCase {
         XCTAssertEqual(Set(scores.map(\.index)), Set(0..<model.expectedCount), file: file, line: line)
         XCTAssertTrue(scores.allSatisfy { !$0.label.isEmpty }, file: file, line: line)
         XCTAssertTrue(scores.allSatisfy { $0.score.isFinite && (0...1).contains($0.score) }, file: file, line: line)
-        for label in ["Knock", "Bark", "Cough", "Vehicle horn, car horn, honking"] {
+        for label in (model.task == .scenes ? Set(SceneAnalysis.labels) : Set(TargetCategory.all.flatMap(\.labels))) {
             XCTAssertEqual(scores.filter { $0.label == label }.count, 1,
-                           "Each primary target must have a raw score even outside Top-5: \(label)", file: file, line: line)
+                           "Each configured target label must have a raw score even outside Top-5: \(label)", file: file, line: line)
         }
     }
 
@@ -55,10 +61,10 @@ final class ModelIntegrationTests: XCTestCase {
                     let engine = try makeEngine(id, store: store, asset: asset)
                     releasedEngine = engine
                     let loadMS = (ProcessInfo.processInfo.systemUptime - loadStart) * 1_000
-                    let count = Int((id.defaultWindow * 16_000).rounded())
+                    let count = Int((id.defaultWindow * Double(id.sampleRate)).rounded())
                     let samples = [Float](repeating: 0, count: count)
                     let start = ProcessInfo.processInfo.systemUptime
-                    let scores = try engine.classify(samples: samples, sampleRate: 16_000)
+                    let scores = try engine.classify(samples: samples, sampleRate: id.sampleRate)
                     let inferenceMS = (ProcessInfo.processInfo.systemUptime - start) * 1_000
                     checkScores(scores, model: id)
                     let ordered = scores.sorted { $0.index < $1.index }
@@ -69,7 +75,7 @@ final class ModelIntegrationTests: XCTestCase {
                         "check": "real_packaged_model_inference", "status": "completed",
                         "model": id.rawValue, "pass": pass,
                         "revision": asset.revision, "frameworkVersion": asset.frameworkVersion,
-                        "input": "synthetic_silence", "sampleRate": 16_000, "sampleCount": count,
+                        "input": "synthetic_silence", "sampleRate": id.sampleRate, "sampleCount": count,
                         "loadMS": loadMS, "inferenceCallMS": inferenceMS,
                         "scoreCount": scores.count,
                         "top5": scores.sorted { $0.score > $1.score }.prefix(5).map(Self.scoreJSON),

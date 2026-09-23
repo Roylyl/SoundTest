@@ -1,0 +1,15 @@
+{
+  "date": "2026-09-22",
+  "appVersion": "1.0.0",
+  "unitIntegrationTests": 32,
+  "uiTests": 1,
+  "failures": 0,
+  "deviceArm64Build": "passed without signing",
+  "simulatorBuild": "passed",
+  "realIPhoneTested": false,
+  "conversionWindows": 4,
+  "referenceAndONNXTop1Matches": 4,
+  "maxProbabilityAbsoluteDifference": 0.0018466711044311523,
+  "onnxWeightsAndLabelsBytes": 2369927,
+  "allModelsAndLabelsBytes": 50170190
+}

@@ -22,7 +22,7 @@ enum AudioFileIO {
     static let sampleRate = 16_000.0
     static let maximumImportSeconds = 600.0
 
-    static func load(url: URL) throws -> DecodedAudio {
+    static func load(url: URL, sampleRate: Double = sampleRate) throws -> DecodedAudio {
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         let file = try AVAudioFile(forReading: url, commonFormat: .pcmFormatFloat32, interleaved: false)
@@ -134,7 +134,7 @@ final class MonoAudioResampler {
         if inputRate == outputRate { converter = nil }
         else {
             guard let value = AVAudioConverter(from: input, to: output) else {
-                throw SoundAudioError.message("无法将输入音频转换为 16 kHz 单声道。")
+                throw SoundAudioError.message("无法将输入音频转换为目标采样率单声道。")
             }
             value.primeMethod = .none
             converter = value

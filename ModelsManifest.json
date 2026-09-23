@@ -90,5 +90,69 @@
         "source": "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite#associated-yamnet_label_list.txt"
       }
     ]
+  },
+  {
+    "id": "efficientAT",
+    "revision": "a425fdce92572e602a1d5634799bd9f1f2efa806 / mn10_as_mAP_471.pt (SHA256 0bd7dc2443af498c289a2e739f02ebb515d6aa3fd3ab9db539c86123ae368a4e)",
+    "frameworkVersion": "ONNX Runtime 1.28.2 CPU · EfficientAT mn10_as opset 17",
+    "source": "https://github.com/fschmid56/EfficientAT",
+    "license": "上游源码 MIT；官方发布页提供权重但未单列权重许可。保留原许可与来源，公开再分发前复核。",
+    "modelFile": "mn10-as.onnx",
+    "labelsFile": "class_labels_indices.csv",
+    "files": [
+      {
+        "path": "mn10-as.onnx",
+        "bytes": 19515407,
+        "sha256": "4ca271b035e3194ff49717c9c62909913d566ed4f3a1ff365238c9fce21368c4",
+        "source": "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/mn10_as_mAP_471.pt"
+      },
+      {
+        "path": "class_labels_indices.csv",
+        "bytes": 14675,
+        "sha256": "cdd1049833c4b86127c2773ac0d14a2754b6a6d0d1798002ed5c66e699708429",
+        "source": "https://github.com/fschmid56/EfficientAT/blob/a425fdce92572e602a1d5634799bd9f1f2efa806/metadata/class_labels_indices.csv"
+      },
+      {
+        "path": "mel-bank.f32",
+        "bytes": 262656,
+        "sha256": "e2024f719d9122b0876e8a3410e586a40e74ee9b62f402635fe2024b0433a49d",
+        "source": "https://github.com/fschmid56/EfficientAT/blob/a425fdce92572e602a1d5634799bd9f1f2efa806/models/preprocess.py"
+      },
+      {
+        "path": "hann-window.f32",
+        "bytes": 3200,
+        "sha256": "0c0d22798aa76bff12404eaa251c650b00751a2f6ac90783a7aaae2635531b1c",
+        "source": "https://github.com/fschmid56/EfficientAT/blob/a425fdce92572e602a1d5634799bd9f1f2efa806/models/preprocess.py"
+      },
+      {
+        "path": "LICENSE-EfficientAT.txt",
+        "bytes": 1071,
+        "sha256": "7a45b1641304427db80df436cab61c04ddb634d97e9a8b7a93de41db940fa8b5",
+        "source": "https://github.com/fschmid56/EfficientAT/blob/a425fdce92572e602a1d5634799bd9f1f2efa806/LICENSE"
+      }
+    ]
+  },
+  {
+    "id": "cpMobile",
+    "revision": "da99d532999c8148cf3e0c7e0f9782324c04071e",
+    "frameworkVersion": "ONNX Runtime 1.28.2 CPU; CP-Mobile generic FP32 with FP16-rounded source weights/features",
+    "source": "https://github.com/CPJKU/dcase2025_task1_inference",
+    "license": "上游仓库未提供明确许可证；本地研究验证，公开再分发前需向权利人确认。",
+    "modelFile": "cp-mobile.onnx",
+    "labelsFile": "labels.txt",
+    "files": [
+      {
+        "path": "cp-mobile.onnx",
+        "bytes": 2369824,
+        "sha256": "59f8882c59a2784d8681dba47eb681d5c2504e4bea2f35c7229d222c9d8eca9b",
+        "source": "https://github.com/CPJKU/dcase2025_task1_inference/tree/da99d532999c8148cf3e0c7e0f9782324c04071e"
+      },
+      {
+        "path": "labels.txt",
+        "bytes": 103,
+        "sha256": "f3ae956dd3a7dfa73bd9dd4906ba3df1d8d56d0562778675f376aa26e0ba2083",
+        "source": "https://github.com/CPJKU/dcase2025_task1_inference/tree/da99d532999c8148cf3e0c7e0f9782324c04071e"
+      }
+    ]
   }
 ]

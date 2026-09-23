@@ -1,0 +1,23 @@
+{
+  "id": "cpMobile",
+  "revision": "da99d532999c8148cf3e0c7e0f9782324c04071e",
+  "frameworkVersion": "ONNX Runtime 1.28.2 CPU; CP-Mobile generic FP32 with FP16-rounded source weights/features",
+  "source": "https://github.com/CPJKU/dcase2025_task1_inference",
+  "license": "上游仓库未提供明确许可证；本地研究验证，公开再分发前需向权利人确认。",
+  "modelFile": "cp-mobile.onnx",
+  "labelsFile": "labels.txt",
+  "files": [
+    {
+      "path": "cp-mobile.onnx",
+      "bytes": 2369824,
+      "sha256": "59f8882c59a2784d8681dba47eb681d5c2504e4bea2f35c7229d222c9d8eca9b",
+      "source": "https://github.com/CPJKU/dcase2025_task1_inference/tree/da99d532999c8148cf3e0c7e0f9782324c04071e"
+    },
+    {
+      "path": "labels.txt",
+      "bytes": 103,
+      "sha256": "f3ae956dd3a7dfa73bd9dd4906ba3df1d8d56d0562778675f376aa26e0ba2083",
+      "source": "https://github.com/CPJKU/dcase2025_task1_inference/tree/da99d532999c8148cf3e0c7e0f9782324c04071e"
+    }
+  ]
+}

@@ -20,3 +20,4 @@ extension View {
 func timeText(_ value: Double) -> String { String(format: "%.2f s", value) }
 func msText(_ value: Double) -> String { String(format: "%.1f ms", value) }
 func scoreText(_ value: Double?) -> String { value.map { String(format: "%.4f", $0) } ?? "未返回 / 标签不支持" }
+func thresholdText(_ value: Double?) -> String { value.map { String(format: "%.2f", $0) } ?? "未设置" }

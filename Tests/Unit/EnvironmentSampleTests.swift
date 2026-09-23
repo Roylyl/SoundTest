@@ -23,73 +23,93 @@ final class EnvironmentSampleTests: XCTestCase {
         let targetID: String?
         let expectedLabel: String?
         let samples: [Float]
+        let samples32: [Float]
         let originalSampleRate: Double
         let originalChannels: Int
     }
 
-    func testFourTargetClipsAndSilenceAcrossPackagedModels() throws {
+    func testFiveContentClipsAndSilenceAcrossPackagedModels() throws {
         let metadataURL = try fixtureURL("EnvironmentFixtures.json")
         let metadataData = try Data(contentsOf: metadataURL)
         let manifest = try JSONDecoder().decode(Manifest.self, from: metadataData)
         let metadata = try JSONSerialization.jsonObject(with: metadataData)
         XCTAssertEqual(manifest.revision, "33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6")
-        XCTAssertEqual(manifest.clips.count, 4)
+        XCTAssertEqual(manifest.clips.count, 5)
 
         var samples: [Sample] = []
         for clip in manifest.clips {
+            let configuredTarget = try XCTUnwrap(TargetCategory.all.first { $0.id == clip.targetID },
+                                                 "Fixture target is not configured: \(clip.targetID)")
+            XCTAssertTrue(configuredTarget.labels.contains(clip.expectedLabel),
+                          "Fixture expected label must belong to its configured business target: \(clip.expectedLabel)")
             let url = try fixtureURL(clip.filename)
             XCTAssertEqual(try Data(contentsOf: url).count, clip.bytes)
             XCTAssertEqual(try SoundModelStore.sha256(url), clip.sha256)
             let decoded = try AudioFileIO.load(url: url)
+            let decoded32 = try AudioFileIO.load(url: url, sampleRate: 32_000)
             XCTAssertEqual(decoded.originalSampleRate, 44_100)
             XCTAssertEqual(decoded.channels, 1)
             XCTAssertEqual(decoded.samples.count, 80_000)
+            XCTAssertEqual(decoded32.samples.count, 160_000)
             samples.append(Sample(testCase: clip.testCase, filename: clip.filename,
                                   targetID: clip.targetID, expectedLabel: clip.expectedLabel,
-                                  samples: decoded.samples, originalSampleRate: decoded.originalSampleRate,
+                                  samples: decoded.samples, samples32: decoded32.samples,
+                                  originalSampleRate: decoded.originalSampleRate,
                                   originalChannels: decoded.channels))
         }
         // Digital silence is a separate functional negative control, not a quiet-room field recording.
         samples.append(Sample(testCase: "S06", filename: nil, targetID: nil, expectedLabel: nil,
                               samples: [Float](repeating: 0, count: 80_000),
+                              samples32: [Float](repeating: 0, count: 160_000),
                               originalSampleRate: 16_000, originalChannels: 1))
         let store = try SoundModelStore(root: XCTUnwrap(Bundle.main.resourceURL))
         var resultRows: [[String: Any]] = []
-        for model in SoundModelID.allCases {
+        for model in SoundModelID.eventModels {
             try autoreleasepool {
                 let asset = try store.validate(model)
                 let folder = store.folder(model)
                 let modelURL = folder.appendingPathComponent(asset.modelFile)
                 let labelsURL = folder.appendingPathComponent(asset.labelsFile)
-                let engine: TaggingEngine = model == .yamnet
-                    ? try YAMNetTagger(modelURL: modelURL, labelsURL: labelsURL, threads: 2)
-                    : try SherpaTagger(modelID: model, modelURL: modelURL, labelsURL: labelsURL, threads: 2)
+                let engine: TaggingEngine
+                if model == .yamnet {
+                    engine = try YAMNetTagger(modelURL: modelURL, labelsURL: labelsURL, threads: 2)
+                } else if model == .efficientAT {
+                    engine = try EfficientATTagger(modelURL: modelURL, labelsURL: labelsURL,
+                        melURL: folder.appendingPathComponent("mel-bank.f32"),
+                        hannURL: folder.appendingPathComponent("hann-window.f32"), threads: 2)
+                } else {
+                    engine = try SherpaTagger(modelID: model, modelURL: modelURL, labelsURL: labelsURL, threads: 2)
+                }
                 var options = SoundOptions()
                 options.mode = .continuous
                 options.windowSeconds = model.defaultWindow; options.stepSeconds = model.defaultStep
                 _ = try options.validated(for: model)
                 for sample in samples {
-                    var planner = WindowPlanner(options: options)
+                    let audio = model.sampleRate == 32_000 ? sample.samples32 : sample.samples
+                    let rate = Double(model.sampleRate)
+                    var planner = WindowPlanner(options: options, sampleRate: model.sampleRate)
                     var windows: [WindowResult] = []
                     var events: [EventEstimate] = []
-                    while let range = planner.next(total: sample.samples.count, finishing: true) {
+                    while let range = planner.next(total: audio.count, finishing: true) {
                         // Only PCM values and a sample rate cross the model API boundary.
-                        var input = Array(sample.samples[range])
+                        var input = Array(audio[range])
                         let padding = planner.windowSamples - input.count
                         input.append(contentsOf: repeatElement(0, count: padding))
                         let start = ProcessInfo.processInfo.systemUptime
-                        let scores = try engine.classify(samples: input, sampleRate: 16_000)
+                        let scores = try engine.classify(samples: input, sampleRate: model.sampleRate)
                         let inferenceMS = (ProcessInfo.processInfo.systemUptime - start) * 1_000
                         XCTAssertEqual(scores.count, model.expectedCount)
                         XCTAssertEqual(Set(scores.map(\.index)), Set(0..<model.expectedCount))
                         XCTAssertTrue(scores.allSatisfy { $0.score.isFinite && (0...1).contains($0.score) })
-                        for target in TargetCategory.all where target.primary {
-                            XCTAssertEqual(scores.filter { target.labels.contains($0.label) }.count, 1,
-                                           "Primary class must retain its raw score even outside Top-5: \(target.id)")
+                        for target in TargetCategory.all {
+                            for label in target.labels {
+                                XCTAssertEqual(scores.filter { $0.label == label }.count, 1,
+                                               "Configured target label must retain its raw score even outside Top-5: \(label)")
+                            }
                         }
-                        let window = WindowResult(index: windows.count, start: Double(range.lowerBound) / 16_000,
-                            end: Double(range.upperBound) / 16_000, modelInputSeconds: Double(input.count) / 16_000,
-                            paddedSeconds: Double(padding) / 16_000, scores: scores,
+                        let window = WindowResult(index: windows.count, start: Double(range.lowerBound) / rate,
+                            end: Double(range.upperBound) / rate, modelInputSeconds: Double(input.count) / rate,
+                            paddedSeconds: Double(padding) / rate, scores: scores,
                             targets: EventAnalysis.targets(scores: scores, options: options), inferenceMS: inferenceMS,
                             processingFinishedAt: Date(), windowCollectionSeconds: nil,
                             queueDelayMS: nil, promptAfterWindowMS: nil)
@@ -99,7 +119,7 @@ final class EnvironmentSampleTests: XCTestCase {
                     XCTAssertFalse(windows.isEmpty)
                     XCTAssertEqual(try XCTUnwrap(windows.last).end, 5.0, accuracy: 0.000001)
                     let meanScores = EventAnalysis.average(windows)
-                    let primary: [[String: Any]] = TargetCategory.all.filter(\.primary).map { category in
+                    let targetScores: [[String: Any]] = TargetCategory.all.map { category in
                         let values = windows.flatMap(\.scores).filter { category.labels.contains($0.label) }
                         let peak = values.max { $0.score < $1.score }
                         return ["targetID": category.id,
@@ -118,25 +138,25 @@ final class EnvironmentSampleTests: XCTestCase {
                         "expectedTargetID": sample.targetID as Any? ?? NSNull(),
                         "expectedLabelForComparisonOnly": sample.expectedLabel as Any? ?? NSNull(),
                         "originalSampleRate": sample.originalSampleRate,
-                        "originalChannels": sample.originalChannels, "modelSampleRate": 16_000,
-                        "audioSeconds": Double(sample.samples.count) / 16_000,
+                        "originalChannels": sample.originalChannels, "modelSampleRate": model.sampleRate,
+                        "audioSeconds": Double(audio.count) / rate,
                         "windowSeconds": options.windowSeconds, "stepSeconds": options.stepSeconds,
                         "mergeGapSeconds": options.mergeGapSeconds, "mappingVersion": ChineseLabels.version,
                         "inferenceCallMS": windows.reduce(0) { $0 + $1.inferenceMS },
                         "windowCollectionSeconds": NSNull(), "trueEventLatencyMS": NSNull(),
-                        "primaryScores": primary,
+                        "targetScores": targetScores,
                         "meanWindowTop5": meanScores.sorted { $0.score > $1.score }.prefix(5).map(Self.scoreJSON),
                         "windows": try json(windows), "eventEstimates": try json(events)
                     ]
                     resultRows.append(row)
-                    print("ENVIRONMENT_SAMPLE \(model.rawValue) \(sample.testCase) " + primary.map {
+                    print("ENVIRONMENT_SAMPLE \(model.rawValue) \(sample.testCase) " + targetScores.map {
                         "\($0["targetID"]!)=\($0["peakWindowScore"]!)"
                     }.joined(separator: " "))
                     try writeArtifact(rows: resultRows, metadata: metadata)
                 }
             }
         }
-        XCTAssertEqual(resultRows.count, 20)
+        XCTAssertEqual(resultRows.count, SoundModelID.eventModels.count * 6)
     }
 
     private func fixtureURL(_ filename: String) throws -> URL {
@@ -167,7 +187,7 @@ final class EnvironmentSampleTests: XCTestCase {
             "generatedAt": ISO8601DateFormatter().string(from: Date()), "environment": environment,
             "operatingSystem": ProcessInfo.processInfo.operatingSystemVersionString,
             "fixtureMetadata": metadata,
-            "scope": "One fixed public sample per S01-S04 category and one digital-silence S06 control; checks decoding and real engine output validity, not accuracy. Target labels do not condition prediction. Scores are not accuracy. Silence is not a real quiet environment.",
+            "scope": "One fixed public sample for S01-S05 (cat, dog, cough, laughter and clapping) and one digital-silence S06 control; checks decoding and real engine output validity, not accuracy. Cat and dog are separate samples for one pet-vocalization business target. Target labels do not condition prediction. Scores are not accuracy. Silence is not a real quiet environment.",
             "metricDefinition": "inferenceCallMS sums real classify calls only. No recording, window collection wait or physical event latency is measured. Default model windows differ; peak-window scores summarize presence, not comparable calibrated probabilities.",
             "results": rows]
         let documents = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask,

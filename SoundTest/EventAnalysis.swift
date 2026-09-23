@@ -6,8 +6,7 @@ enum EventAnalysis {
             let matching = scores.filter { target.labels.contains($0.label) }
             let best = matching.max { $0.score < $1.score }
             return TargetScore(id: target.id, chinese: target.chinese, score: best?.score,
-                               originalLabel: best?.label, threshold: options.thresholds[target.id] ?? 0.3,
-                               enabled: target.primary || options.includeExtensions)
+                               originalLabel: best?.label, threshold: options.thresholds[target.id] ?? 0.3)
         }
     }
 

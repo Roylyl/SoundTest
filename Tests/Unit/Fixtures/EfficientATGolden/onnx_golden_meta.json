@@ -1,0 +1,228 @@
+{
+  "onnx_model": "/tmp/efficientat-export-mn10/assets/mn10_as_527_128mel.onnx",
+  "onnx_model_sha256": "4ca271b035e3194ff49717c9c62909913d566ed4f3a1ff365238c9fce21368c4",
+  "onnxruntime_version": "1.23.2",
+  "onnx_input_name": "mel",
+  "onnx_input_shape": [
+    1,
+    1,
+    128,
+    1000
+  ],
+  "onnx_output_name": "scores",
+  "onnx_output_shape": [
+    1,
+    527
+  ],
+  "onnx_output_semantics": "probabilities; export wrapper includes sigmoid",
+  "runs": {
+    "pytorch_frontend": {
+      "input_mel_file": "mel_10s_128x1000_f32le.bin",
+      "score_file": "mn10_scores_10s_527_pytorch_frontend_f32le.bin",
+      "score_sha256": "c3c9774bdbea05fe1c844318188ff525e13a9f9f5492f5ae139d055ec46689e3",
+      "score_min": 5.662441253662109e-07,
+      "score_max": 0.5179588794708252,
+      "score_sample_values": {
+        "0": 0.008714884519577026,
+        "16": 6.0051679611206055e-05,
+        "47": 1.5407800674438477e-05,
+        "63": 5.790591239929199e-05,
+        "67": 3.668665885925293e-05,
+        "75": 1.5050172805786133e-05,
+        "82": 8.672475814819336e-06,
+        "83": 6.172060966491699e-05,
+        "137": 0.01530429720878601,
+        "393": 0.06401491165161133,
+        "394": 0.16519039869308472,
+        "501": 0.5179588794708252,
+        "526": 0.00011435151100158691
+      },
+      "top5": [
+        {
+          "index": 501,
+          "mid": "/m/01v_m0",
+          "label": "Sine wave",
+          "score": 0.5179588794708252
+        },
+        {
+          "index": 394,
+          "mid": "/m/01z47d",
+          "label": "Busy signal",
+          "score": 0.16519039869308472
+        },
+        {
+          "index": 393,
+          "mid": "/m/015jpf",
+          "label": "Dial tone",
+          "score": 0.06401491165161133
+        },
+        {
+          "index": 137,
+          "mid": "/m/04rlf",
+          "label": "Music",
+          "score": 0.01530429720878601
+        },
+        {
+          "index": 0,
+          "mid": "/m/09x0r",
+          "label": "Speech",
+          "score": 0.008714884519577026
+        }
+      ],
+      "targets": {
+        "petVocalization": {
+          "best_index": 83,
+          "best_label": "Meow",
+          "score": 6.172060966491699e-05,
+          "all_indices": [
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            82,
+            83,
+            84,
+            85
+          ]
+        },
+        "cough": {
+          "best_index": 47,
+          "best_label": "Cough",
+          "score": 1.5407800674438477e-05,
+          "all_indices": [
+            47
+          ]
+        },
+        "laughter": {
+          "best_index": 16,
+          "best_label": "Laughter",
+          "score": 6.0051679611206055e-05,
+          "all_indices": [
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        },
+        "applause": {
+          "best_index": 63,
+          "best_label": "Clapping",
+          "score": 5.790591239929199e-05,
+          "all_indices": [
+            63,
+            67
+          ]
+        }
+      }
+    },
+    "accelerate_frontend": {
+      "input_mel_file": "mel_accelerate_10s_128x1000_f32le.bin",
+      "score_file": "mn10_scores_10s_527_accelerate_frontend_f32le.bin",
+      "score_sha256": "4840042d3b00a0a08e1d83d867c19e4b9cbc68a27404b77582ebfe973fe38c83",
+      "score_min": 5.960464477539062e-07,
+      "score_max": 0.5179594159126282,
+      "score_sample_values": {
+        "0": 0.008714944124221802,
+        "16": 5.9932470321655273e-05,
+        "47": 1.5467405319213867e-05,
+        "63": 5.796551704406738e-05,
+        "67": 3.668665885925293e-05,
+        "75": 1.5020370483398438e-05,
+        "82": 8.672475814819336e-06,
+        "83": 6.178021430969238e-05,
+        "137": 0.015304237604141235,
+        "393": 0.06401503086090088,
+        "394": 0.16518929600715637,
+        "501": 0.5179594159126282,
+        "526": 0.00011432170867919922
+      },
+      "top5": [
+        {
+          "index": 501,
+          "mid": "/m/01v_m0",
+          "label": "Sine wave",
+          "score": 0.5179594159126282
+        },
+        {
+          "index": 394,
+          "mid": "/m/01z47d",
+          "label": "Busy signal",
+          "score": 0.16518929600715637
+        },
+        {
+          "index": 393,
+          "mid": "/m/015jpf",
+          "label": "Dial tone",
+          "score": 0.06401503086090088
+        },
+        {
+          "index": 137,
+          "mid": "/m/04rlf",
+          "label": "Music",
+          "score": 0.015304237604141235
+        },
+        {
+          "index": 0,
+          "mid": "/m/09x0r",
+          "label": "Speech",
+          "score": 0.008714944124221802
+        }
+      ],
+      "targets": {
+        "petVocalization": {
+          "best_index": 83,
+          "best_label": "Meow",
+          "score": 6.178021430969238e-05,
+          "all_indices": [
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            82,
+            83,
+            84,
+            85
+          ]
+        },
+        "cough": {
+          "best_index": 47,
+          "best_label": "Cough",
+          "score": 1.5467405319213867e-05,
+          "all_indices": [
+            47
+          ]
+        },
+        "laughter": {
+          "best_index": 16,
+          "best_label": "Laughter",
+          "score": 5.9932470321655273e-05,
+          "all_indices": [
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        },
+        "applause": {
+          "best_index": 63,
+          "best_label": "Clapping",
+          "score": 5.796551704406738e-05,
+          "all_indices": [
+            63,
+            67
+          ]
+        }
+      }
+    }
+  },
+  "pytorch_vs_accelerate_score_max_absolute_difference": 1.1026859283447266e-06,
+  "pytorch_vs_accelerate_score_mean_absolute_difference": 3.172505458337582e-08
+}

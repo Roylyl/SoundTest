@@ -14,6 +14,8 @@ for model in ['zipformer','cedTiny','cedMini']:
     assets.append(asset)
 yam=json.loads((root/'ModelLibrary/yamnet/YamnetManifest.json').read_text())
 assets.append(dict(id='yamnet',revision=yam['version'],frameworkVersion='TensorFlow Lite C 2.17.0 · CPU',source=yam['source'],license=yam['license'],modelFile='yamnet.tflite',labelsFile='yamnet_label_list.txt',files=[dict(f,source=yam['source']+('#associated-yamnet_label_list.txt' if f['path'].endswith('.txt') else '')) for f in yam['files'] if f['path']!='LICENSE']))
+asc=root/'ModelLibrary/cpMobile/ASCManifest.json'
+if asc.exists(): assets.append(json.loads(asc.read_text()))
 for asset in assets:
     for f in asset['files']:
         data=(root/'ModelLibrary'/asset['id']/f['path']).read_bytes()

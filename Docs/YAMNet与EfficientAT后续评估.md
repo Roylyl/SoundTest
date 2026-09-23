@@ -1,19 +1,18 @@
-# EfficientAT 后续接入评估
-评估日期：2026-09-21。EfficientAT `mn04_as` 保留为下一轮候选，本轮没有将它声明为已安装或可推理，也未添加同名占位推理结果。首批四个模型的交付不依赖此转换。
-## 结论
-优先研究 `mn04_as`，必要时再用 `mn10_as` 比较质量与耗时。仓库提供 PyTorch 音频分类模型和权重，未核验到可直接放入本工程的官方 iOS 运行包；不能把模型文件改后缀视为移植完成。
-官方表格中 `mn04_as` 为约 0.983M 参数，`mn10_as` 为约 4.88M 参数。参数量只描述网络规模，不能推导 iPhone 延迟、峰值内存或整个 App 体积。
-## 前处理需要单独对齐
-本次阅读了上游 `inference.py`、`models/preprocess.py` 和 README。默认推理是 32 kHz 单声道、128 个 mel 频带、窗长 800 样本、步长 320 样本和 1024 点 FFT。实现还包含 0.97 预加重、非周期 Hann 窗、居中 STFT、Kaldi mel filterbank、`log(melspec + 0.00001)` 与 `(melspec + 4.5) / 5`。推理必须使用 `eval()`，关闭训练时的数据增强；输出 logits 后还需要 sigmoid。
-这些细节与 YAMNet 前处理不同，也不能默认等于 sherpa-onnx Audio Tagging 的前处理。Torch STFT 的 padding、mel filterbank、浮点精度和动态时间维度是转换时的主要核验项。
-## 接入顺序
-1. 固定 EfficientAT 源码提交、`mn04_as` 权重、类别表及许可，先在电脑 CPU 运行参考脚本，保留统一音频的全量分数。
-2. 优先把分类网络导出为 ONNX，使用本工程已经依赖的 ONNX Runtime；前处理可保留为单独模块，但必须与 Python 逐项比较。若 ONNX 图含不支持的算子，再评估 Core ML，避免同时引入多余运行库。
-3. 对静音、短片段、单目标、混合目标及不同长度音频，分别比较特征张量、全部类别输出、Top-5 和重点类分数；报告绝对误差及差异，不只看最高类别是否一致。
-4. iPhone 验证加载、连续窗口、速度、内存、发热和后台/中断恢复。只有转换正确性与真机运行都经过核验后，才把模型加入可切换列表。
-5. `mn04_as` 达到基本可运行状态后，再决定是否加入 `mn10_as`。仓库模型使用 MIT 许可声明；实际发布时保留源码许可与所选权重的来源和条款记录。
-## 参考来源
-仓库：https://github.com/fschmid56/EfficientAT
-前处理：https://github.com/fschmid56/EfficientAT/blob/main/models/preprocess.py
-推理入口：https://github.com/fschmid56/EfficientAT/blob/main/inference.py
-许可：https://github.com/fschmid56/EfficientAT/blob/main/LICENSE
+# EfficientAT mn10_as 接入与 YAMNet 对照
+核对日期：2026-09-23。SoundTest 1.0.0 已把 EfficientAT `mn10_as` 作为 M05 接入本地模型列表。官方 PyTorch 权重转换为固定10秒输入的 ONNX，iOS 通过现有 ONNX Runtime 1.28.2 CPU 与 Accelerate 前处理执行。M05 不使用云端推理；`mn04_as` 尚未接入。
+## 模型与接入状态
+|项目|M04 YAMNet|M05 EfficientAT mn10_as|
+|---|---|---|
+|工程文件|TFLite；模型及类别表约4.13 MB|ONNX、类别表与前处理资源约19.80 MB，未量化|
+|模型输入|16 kHz 单声道，0.975秒窗口|32 kHz 单声道，固定10秒窗口；本地128维 Mel 前处理|
+|模型输出|521类逐窗分数|527类逐窗 sigmoid 分数|
+|本地运行库|TensorFlow Lite C 2.17.0 CPU|ONNX Runtime 1.28.2 CPU，Accelerate 前处理|
+|当前验证|500 份 WAV：来源目标命中 362/500|同一 500 份 WAV：来源目标命中 307/500；合成音频前处理与输出数值对齐|
+两者的输入采样率、窗口、类别表和前处理都不同。当前 App 对 M05 的短音频补足10秒，对长音频分窗；它仍是片段分类模型，事件时间由应用窗口和阈值估计。模型分数之间不能直接比较大小，推理调用次数也受步长影响。
+## 转换与数值核对
+上游代码固定为 https://github.com/fschmid56/EfficientAT/tree/a425fdce92572e602a1d5634799bd9f1f2efa806 ，权重取自官方发布的 https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/mn10_as_mAP_471.pt 。原权重 SHA256 为 `0bd7dc2443af498c289a2e739f02ebb515d6aa3fd3ab9db539c86123ae368a4e`；派生 ONNX SHA256 为 `4ca271b035e3194ff49717c9c62909913d566ed4f3a1ff365238c9fce21368c4`。类别表和前处理文件各自的大小与哈希见 `ModelLibrary/efficientAT/README.md` 和 `ModelsManifest.json`。
+ONNX 只包含分类网络及 sigmoid，输入 `[1,1,128,1000]`、输出 `[1,527]`。前处理在 iOS 本地执行：0.97预加重、1024点FFT、800点对称Hann窗、320点hop、反射填充、128维Kaldi Mel、对数及归一化。官方示例音频的 PyTorch 与 ONNX 全量分数最大绝对差 `4.77e-7`。自主生成的10秒测试音频在 iOS 模拟器上的 Mel 与 PyTorch 参考最大绝对差 `6.68e-6`，同时得到527个有限输出分数。这些数字验证实现对齐，不代表四个目标类的识别效果。
+## 已验证范围
+Xcode 27.1 的 iOS 模拟器构建已通过，合成音频的实际 iOS 前处理测试已通过；五组各 100 份 WAV 的批测完成，M05 的 500 条 Session 与 5 个批次日志均无异常。上述命中数只针对来源目标和统一 0.30 阈值，原始 JSON 与完整口径见 `SoundTest_声音识别测试记录.md`。本文件不据此推断真机速度或准确率。iPhone 真机的麦克风链路、内存峰值、耗电、温升与长时间监听尚未验证。尤其不能从 ONNX 文件约19.5 MB 推出运行内存。
+## 许可边界
+上游仓库源码附 MIT 许可，`ModelLibrary/efficientAT/LICENSE-EfficientAT.txt` 保留原文。官方发布页未给权重单列许可；本地派生 ONNX 的公开再分发条件须单独核对。SoundTest 的 Apache-2.0 不自动覆盖官方权重及其派生文件；详见 `THIRD_PARTY_NOTICES.md`。
