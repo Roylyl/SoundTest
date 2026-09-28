@@ -1,5 +1,5 @@
-# CP-Mobile 简化版（通用模型）
-DCASE 2025 Task 1：CPJKU/dcase2025_task1_inference，固定提交 da99d532999c8148cf3e0c7e0f9782324c04071e。
+# CP-Mobile简化版（通用模型）
+DCASE 2025 Task 1：CPJKU/dcase2025_task1_inference，固定提交da99d532999c8148cf3e0c7e0f9782324c04071e。
 来源：https://github.com/CPJKU/dcase2025_task1_inference
 源checkpoint：Schmid_CPJKU_task1/ckpts/baseline.ckpt；仅选base_model（unknown设备），不含设备专属分支。
 App使用cp-mobile.onnx和labels.txt，合计2,369,927字节；SHA256与固定来源见ASCManifest.json。其余说明文件不参与推理。
